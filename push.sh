@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#this script automates the add commit and push flow
+#this script automates the add commit and push flow - branch agnostic
 
 git add .
 
