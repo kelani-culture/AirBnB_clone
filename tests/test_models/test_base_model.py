@@ -22,11 +22,12 @@ class TestBaseModels(unittest.TestCase):
     """
     A Test for the BaseModels class
 
-    test_uuid - tesst for the validity of the uuid
+    test_uuid - test for the validity of the uuid
     test_created_date - test if the current datetime matches
     test_updated_date - test if the updated datetime matches
     test_instances - test for  the validity of each datatype
     test_save
+    test_uuid - test for the validity of the uuid
     test_to_dict - returns the dictionary represenation of an object
     test_str - test if the string representation were returned
     """

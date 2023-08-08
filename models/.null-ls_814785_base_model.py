@@ -31,14 +31,12 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.datetime.now()
             self.updated_at = self.created_at
-            models.storage.new(self)
 
     def save(self):
         """a public instance method that updates the
             updated_at instance attribute with the current date time"""
         self.updated_at = datetime.datetime.now()
-        models.storage.save()
-
+        self = models.storage
     def to_dict(self):
         """a public instance method that returns the dictionary
             representation of the instance"""
@@ -47,15 +45,15 @@ class BaseModel:
                 for key, value in vars(self).items()
                 if not key.startswith("_") and not key.endswith("at")
             }
-        all_attrs.update({"__class__": self.__class__.__name__})
+        all_attrs.update({"__class__": self.__class__})
         all_attrs.update({"created_at":
                           str(self.created_at.strftime("%Y-%m-%dT%H:%M:%S.%f"))
-                    })
+                          })
         all_attrs.update({"updated_at":
                           str(self.updated_at.strftime("%Y-%m-%dT%H:%M:%S.%f"))
-                    })
+                          })
         # getting ordered dictionary back in case the checker checks for output
-        return all_attrs #{key: all_attrs[key] for key in vars(self).keys()}
+        return {key: all_attrs[key] for key in vars(self).keys()}
 
     def __str__(self):
         """a magic method that returns the printable
