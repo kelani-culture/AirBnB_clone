@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 #this script automates the add commit and push flow - branch agnostic
-#testing the script...
 
 git add .
 
