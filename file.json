@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"BaseModel.e74b2e86-8e3e-4006-b5c5-f5d4af755af9": {"id": "e74b2e86-8e3e-4006-b5c5-f5d4af755af9", "__class__": "BaseModel", "created_at": "2023-08-08T23:48:49.393040", "updated_at": "2023-08-08T23:48:49.393040"}, "BaseModel.4a052698-0e02-4c1e-a98b-254304d29964": {"id": "4a052698-0e02-4c1e-a98b-254304d29964", "__class__": "BaseModel", "created_at": "2023-08-08T23:48:50.284275", "updated_at": "2023-08-08T23:48:50.284275"}, "BaseModel.2c576f16-08c2-43bd-9838-dd5db8b43e96": {"id": "2c576f16-08c2-43bd-9838-dd5db8b43e96", "name": "My_First_Model", "my_number": 89, "__class__": "BaseModel", "created_at": "2023-08-08T23:48:51.367042", "updated_at": "2023-08-08T23:48:51.367104"}}
+=======
+[{"id": "3e44699c-a9c4-4abf-bff6-fce109a60f54", "created_at": "2023-08-08T20:34:21.386849", "updated_at": "2023-08-08T20:34:21.386873", "name": "My_First_Model", "my_number": 89}]
+>>>>>>> 82b11360c05aa0605acc8acb78d0d94bde6499b4
