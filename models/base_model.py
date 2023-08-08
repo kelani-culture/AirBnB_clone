@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import datetime
+from . import storage
 import uuid
 
 """ the module that defines the base model class """
@@ -30,11 +31,13 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.datetime.now()
             self.updated_at = self.created_at
+            storage.new(self)
 
     def save(self):
         """a public instance method that updates the
             updated_at instance attribute with the current date time"""
         self.updated_at = datetime.datetime.now()
+        storage.save()
 
     def to_dict(self):
         """a public instance method that returns the dictionary
