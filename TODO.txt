@@ -1,1 +1,1 @@
-task 5 is not fully tested and neither is it completed.
+task 5 is not fully tested and neither is it complete
