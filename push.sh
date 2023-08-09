@@ -10,7 +10,7 @@ else
 	message=""
 	while [[ -z "$message" ]];
 	do
-		echo -en "please provide a commit message :"
+		echo -en "please provide a commit message : "
 		read -r message
 		if [[ -n "$message" ]];
 		then
