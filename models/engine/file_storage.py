@@ -29,7 +29,7 @@ class FileStorage:
 
     def all(self):
         """a public instance method that returns all objects"""
-        return FileStorage.__objects
+        return {key: val.to_dict() for key, val in self.__objects.items()}
 
     def new(self, obj):
         """adds an instance to the FileStorage.__objects
