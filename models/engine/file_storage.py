@@ -35,33 +35,32 @@ class FileStorage:
         """adds an instance to the FileStorage.__objects
             dictionary"""
         key = f"{obj.__class__.__name__}.{obj.id}"
-        self.__objects[key] = obj
+        FileStorage.__objects[key] = obj
 
     def save(self):
         """a public instance field that writes the FileStorage.__objects
             to a file"""
         json_obj = {key: item.to_dict() for key,
-                    item in self.__objects.items()}
+                    item in FileStorage.__objects.items()}
         if not json_obj:
-            with open(self.__file_path, mode="w",
+            with open(FileStorage.__file_path, mode="w",
                       encoding="utf-8") as file:
                 return json.dump({}, file)
         else:
-            with open(self.__file_path, mode="w",
+            with open(FileStorage.__file_path, mode="w",
                       encoding="utf-8") as file:
                 json.dump(json_obj, file)
 
     def reload(self):
         """a public instance methods that deserializes a JSON file
             to FileStorage.__objects"""
-        if not file_exists(self.__file_path):
+        if not file_exists(FileStorage.__file_path):
             return
-        with open(self.__file_path, mode="r",
+        with open(FileStorage.__file_path, mode="r",
                   encoding="utf-8") as f_ptr:
-            self.__objects = json.load(f_ptr)
-            for key, value in self.__objects.items():
+            FileStorage.__objects = json.load(f_ptr)
+            for key, value in FileStorage.__objects.items():
                 class_str = key.split(".")[0]
                 instance = globals()[class_str](**value)
-                self.__objects[key] = instance
                 FileStorage.__objects[key] = instance
         return self.__objects
