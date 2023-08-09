@@ -7,7 +7,7 @@ import cmd
 import sys
 
 
-def handle_arg(args, parsed, handler=None):
+def handle_arg(args, command, parsed, handler=None):
     """
     handle_arg - this validates the argument passed and handles it
     it's always going to be in the format:
@@ -18,21 +18,24 @@ def handle_arg(args, parsed, handler=None):
     Returns:
         None
     """
+    cls_name = None
     if not handler:
         return
-    if (not args):
-        handler()
 
     if parsed:
         cls_name = parsed[0]
-        if not (cls_name in globals()):
+        if not (parsed[0] in globals()):
             print("** class doesn't exist **")
             return
+    elif command == "all":
+        pass
     else:
         print("** class name missing **")
         return
 
     match args:
+        case 0:
+            handler(cls_name)
         case 1:
             handler(cls_name)
         case 2:
@@ -73,11 +76,29 @@ def handle_destroy(cls_name, id):
     res_objs = storage.all()
     key = f"{cls_name}.{id}"
     try:
-        res = res_objs[key]
+        _ = res_objs[key]
     except KeyError:
         print("** no instance found **")
         return
     del res_objs[key]
+
+
+def handle_all(cls_name):
+    """this handles the printing of the string representation of all
+        instances based or not on the class name"""
+    if not cls_name:
+        res_insts = {key: value.to_dict() for key,
+                     value in storage.all().items()}
+    else:
+        res_insts = {key: value.to_dict() for key,
+                     value in storage.all().items()
+                     if key.startswith(cls_name)}
+    for key, value in res_insts.items():
+        class_str = key.split(".")[0]
+        instance = globals()[class_str](**value)
+        res_insts[key] = instance.__str__()
+    res_array = [value for key, value in res_insts.items()]
+    print(res_array)
 
 
 class HbnbCommand(cmd.Cmd):
@@ -89,19 +110,25 @@ class HbnbCommand(cmd.Cmd):
         """this delegates the creation of new instances
             from passed in class names"""
         parsed = line.split()
-        handle_arg(1, parsed, handle_create)
+        handle_arg(1, "create", parsed, handle_create)
 
     def do_show(self, line):
         """this delegates the printing of string representation of
             an instance based on a class"""
         parsed = line.split()
-        handle_arg(2, parsed, handle_show)
+        handle_arg(2, "show", parsed, handle_show)
 
     def do_destroy(self, line):
-        """this destroy the destruction of instances
+        """this delegates the destruction of instances
             based on a class"""
         parsed = line.split()
-        handle_arg(2, parsed, handle_destroy)
+        handle_arg(2, "destroy", parsed, handle_destroy)
+
+    def do_all(self, line):
+        """this delegates the printing of all
+            the instances in the storage engine"""
+        parsed = line.split()
+        handle_arg(0, "all", parsed, handle_all)
 
     def do_quit(self, line):
         """exit handler for the cmd loop"""
