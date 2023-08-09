@@ -1,7 +1,9 @@
 # Airbnb Clone Project
 
-**By Darasimi <kelanidarasimi9@gmail>
- [Your Friend's Name]**
+<h2>AUTHORS:</h2>
+
+- [Darasimi](kelanidarasimi9@gmail)
+- [Daniel](olaleyedaniel2000@gmail.com)
 
 Welcome to the Airbnb Clone project! we aim to deploy a simplified version of the Airbnb website.
 
