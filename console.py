@@ -3,6 +3,7 @@
 
 from models.base_model import BaseModel
 from models import storage
+from models.user import User
 import cmd
 import sys
 
@@ -86,20 +87,25 @@ def handle_destroy(cls_name, id):
 def handle_all(cls_name):
     """this handles the printing of the string representation of all
         instances based or not on the class name"""
-    if not cls_name:
-        res_insts = {key: value for key,
-                     value in storage.all().items()}
-    else:
-        res_insts = {key: value for key,
-                     value in storage.all().items()
-                     if key.startswith(cls_name)}
-    for key, value in res_insts.items():
-        class_str = key.split(".")[0]
-        instance = globals()[class_str](**value)
-        res_insts[key] = instance.__str__()
-    res_array = [value for key, value in res_insts.items()]
-    print(res_array)
-
+    # if not cls_name:
+    #     res_insts = {key: value for key,
+    #                  value in storage.all().items()}
+    # else:
+    #     res_insts = {key: value for key,
+    #                  value in storage.all().items()
+    #                  if key.startswith(cls_name)}
+    # print(res_insts)
+    # for key, value in res_insts.items():
+    #     class_str = key.split(".")[0]
+    #     instance = globals()[class_str](**value)
+    #     res_insts[key] = instance.__str__()
+    # res_array = [value for key, value in res_insts.items()]
+    store_obj = []
+    all_objs = storage.all()
+    for obj_id in all_objs.keys():
+        obj = all_objs[obj_id]
+        store_obj.append(obj.__str__())
+    print(store_obj)
 
 class HbnbCommand(cmd.Cmd):
     """Implementation of the command line

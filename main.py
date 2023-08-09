@@ -1,9 +1,13 @@
 #!/usr/bin/python3
 from models import storage
 from models.base_model import BaseModel
+from models.user import User
+
+
+from models import storage
+from models.base_model import BaseModel
 
 all_objs = storage.all()
-print(all_objs)
 print("-- Reloaded objects --")
 for obj_id in all_objs.keys():
     obj = all_objs[obj_id]

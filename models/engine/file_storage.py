@@ -1,6 +1,7 @@
 """a module that defines a FileStorage class"""
 import json
 from models.base_model import BaseModel
+from models.user import User
 
 
 def file_exists(file_str):
@@ -29,7 +30,7 @@ class FileStorage:
 
     def all(self):
         """a public instance method that returns all objects"""
-        return {key: val.to_dict() for key, val in self.__objects.items()}
+        return self.__objects #{key: val.to_dict() for key, val in self.__objects.items()}
 
     def new(self, obj):
         """adds an instance to the FileStorage.__objects
@@ -63,6 +64,7 @@ class FileStorage:
             for key, value in FileStorage.__objects.items():
                 class_str = key.split(".")[0]
                 instance = globals()[class_str](**value)
+
                 for attr_name, attr_value in value.items():
                     if attr_name not in ['id', 'updated_at', 'created_at', '__class__']:
                         setattr(instance, attr_name, attr_value)
