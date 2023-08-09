@@ -36,6 +36,7 @@ class FileStorage:
             dictionary"""
         key = f"{obj.__class__.__name__}.{obj.id}"
         self.__objects[key] = obj
+        print(self.__objects)
 
     def save(self):
         """a public instance field that writes the FileStorage.__objects
@@ -62,6 +63,9 @@ class FileStorage:
             for key, value in self.__objects.items():
                 class_str = key.split(".")[0]
                 instance = globals()[class_str](**value)
+                for attr_name, attr_value in value.items():
+                    if attr_name not in ['id', 'updated_at', 'created_at', '__class__']:
+                        setattr(instance, attr_name, attr_value)
                 self.__objects[key] = instance
                 FileStorage.__objects[key] = instance
         return self.__objects
