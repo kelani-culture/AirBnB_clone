@@ -87,10 +87,10 @@ def handle_all(cls_name):
     """this handles the printing of the string representation of all
         instances based or not on the class name"""
     if not cls_name:
-        res_insts = {key: value.to_dict() for key,
+        res_insts = {key: value for key,
                      value in storage.all().items()}
     else:
-        res_insts = {key: value.to_dict() for key,
+        res_insts = {key: value for key,
                      value in storage.all().items()
                      if key.startswith(cls_name)}
     for key, value in res_insts.items():
