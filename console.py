@@ -67,10 +67,29 @@ def handle_show(cls_name, id):
     print(res)
 
 
+def handle_destroy(cls_name, id):
+    """this handles the destruction of instances
+        based on a class"""
+    res_objs = storage.all()
+    key = f"{cls_name}.{id}"
+    try:
+        res = res_objs[key]
+    except KeyError:
+        print("** no instance found **")
+        return
+    del res_objs[key]
+
+
 class HbnbCommand(cmd.Cmd):
     """Implementation of the command line
         intepreter"""
     prompt = "(hbnb) "
+
+    def do_create(self, line):
+        """this delegates the creation of new instances
+            from passed in class names"""
+        parsed = line.split()
+        handle_arg(1, parsed, handle_create)
 
     def do_show(self, line):
         """this delegates the printing of string representation of
@@ -78,11 +97,11 @@ class HbnbCommand(cmd.Cmd):
         parsed = line.split()
         handle_arg(2, parsed, handle_show)
 
-    def do_create(self, line):
-        """this delegates the creation of new instances
-            from passed in class names"""
+    def do_destroy(self, line):
+        """this destroy the destruction of instances
+            based on a class"""
         parsed = line.split()
-        handle_arg(1, parsed, handle_create)
+        handle_arg(2, parsed, handle_destroy)
 
     def do_quit(self, line):
         """exit handler for the cmd loop"""
