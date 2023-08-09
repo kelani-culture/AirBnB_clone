@@ -55,7 +55,7 @@ class BaseModel:
                           str(self.updated_at.strftime("%Y-%m-%dT%H:%M:%S.%f"))
                     })
         # getting ordered dictionary back in case the checker checks for output
-        return all_attrs #{key: all_attrs[key] for key in vars(self).keys()}
+        return {key: all_attrs[key] for key in vars(self).keys()}
 
     def __str__(self):
         """a magic method that returns the printable
