@@ -2,7 +2,7 @@
 """A module that implements the command line"""
 
 from models.base_model import BaseModel
-from models.engine.file_storage import storage
+from models import storage
 import cmd
 import sys
 
@@ -46,19 +46,43 @@ def handle_arg(args, parsed, handler=None):
             pass
 
 
+def handle_create(cls_name):
+    """this handles the creation of new instances and writing
+        to a JSON file"""
+    new_instance = (globals()[cls_name])()
+    new_instance.save()
+    print(new_instance.id)
+
+
+def handle_show(cls_name, id):
+    """this handles the printing of string representation of
+        an instance based on a class"""
+    res_objs = storage.all()
+    key = f"{cls_name}.{id}"
+    try:
+        res = res_objs[key]
+    except KeyError:
+        print("** no instance found **")
+        return
+    print(res)
+
+
 class HbnbCommand(cmd.Cmd):
     """Implementation of the command line
         intepreter"""
     prompt = "(hbnb) "
 
+    def do_show(self, line):
+        """this delegates the printing of string representation of
+            an instance based on a class"""
+        parsed = line.split()
+        handle_arg(2, parsed, handle_show)
+
     def do_create(self, line):
-        """this handles the creation of new instances
+        """this delegates the creation of new instances
             from passed in class names"""
         parsed = line.split()
-
-        def print_cls(cls_name):
-            print("yea, i know this class :{}".format(cls_name))
-        handle_arg(1, parsed, print_cls)
+        handle_arg(1, parsed, handle_create)
 
     def do_quit(self, line):
         """exit handler for the cmd loop"""
