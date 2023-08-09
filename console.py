@@ -8,7 +8,12 @@ import sys
 class HbnbCommand(cmd.Cmd):
     """Implementation of the command line
         intepreter"""
-    cmd.Cmd.prompt = "(hbnb)"
+    prompt = "(hbnb) "
+
+    def do_create(self, line):
+        """this handles the creation of new instances
+            from passed in class names"""
+        print(line)
 
     def do_quit(self, line):
         """exit handler for the cmd loop"""
@@ -19,7 +24,7 @@ class HbnbCommand(cmd.Cmd):
         print("Quit command to exit the program")
 
     def do_EOF(self, line):
-        """handles the CTRL ^D"""
+        """handles the CTRL+D key combs"""
         return True
 
 

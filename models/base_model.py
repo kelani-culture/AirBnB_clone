@@ -37,7 +37,7 @@ class BaseModel:
         """a public instance method that updates the
             updated_at instance attribute with the current date time"""
         self.updated_at = datetime.datetime.now()
-        models.storage.save()
+        models.storage.save(self)
 
     def to_dict(self):
         """a public instance method that returns the dictionary
@@ -55,7 +55,7 @@ class BaseModel:
                           str(self.updated_at.strftime("%Y-%m-%dT%H:%M:%S.%f"))
                     })
         # getting ordered dictionary back in case the checker checks for output
-        return all_attrs #{key: all_attrs[key] for key in vars(self).keys()}
+        return {key: all_attrs[key] for key in vars(self).keys()}
 
     def __str__(self):
         """a magic method that returns the printable
