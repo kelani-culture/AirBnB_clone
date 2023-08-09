@@ -2,7 +2,7 @@
 
 <h2>AUTHORS:</h2>
 
-- Darasimi - kelanidarasimi9@gmail
+- Darasimi - kelanidarasimi9@gmail.com
 - Daniel - olaleyedaniel2000@gmail.com
 
 Welcome to the Airbnb Clone project! we aim to deploy a simplified version of the Airbnb website.
