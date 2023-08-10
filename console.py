@@ -100,12 +100,12 @@ def handle_all(cls_name):
     #     instance = globals()[class_str](**value)
     #     res_insts[key] = instance.__str__()
     # res_array = [value for key, value in res_insts.items()]
-    store_obj = []
-    all_objs = storage.all()
-    for obj_id in all_objs.keys():
-        obj = all_objs[obj_id]
-        store_obj.append(obj.__str__())
-    print(store_obj)
+    store_attr = []
+    all_attr = storage.all()
+    for attr_id in all_attr.keys():
+        attr = all_attr[attr_id]
+        store_attr.append(attr.__str__())
+    print(store_attr)
 
 class HbnbCommand(cmd.Cmd):
     """Implementation of the command line
