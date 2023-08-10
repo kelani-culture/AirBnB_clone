@@ -3,3 +3,4 @@ we may face checker issues with our command line interpreter implementation.
 	areas to check:
 		- the prompt, toggle a space to check for changes in the checker
 handle empty commands
+write a variant of the handle_arg command . call it handle_dot_arg
