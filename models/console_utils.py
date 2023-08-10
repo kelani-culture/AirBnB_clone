@@ -2,15 +2,31 @@
 """a module that defines utility functions for the console module"""
 
 from . import base_model
+from . import user
 import cmd
+import re
 from . import storage
 
 # globals
 BaseModel = base_model.BaseModel
+User = user.User
 completion_classes = ["BaseModel", "State", "City", "Place", "User"]
 
 
-completion_classes = ["BaseModel", "State", "City", "Place", "User"]
+def derive_type_from_string(string: str):
+    """this derives a type from an input string based on its value"""
+    float_pattern = r"^\d+\.\d+$"
+    int_pattern = r"^\d+$"
+    string_pattern = r"[^\d]+"
+
+    if (re.match(float_pattern, string) is not None):
+        return float
+    elif (re.match(int_pattern, string) is not None):
+        return int
+    elif (re.match(string_pattern, string) is not None):
+        return str
+    else:
+        return str
 
 
 def handle_arg(args, command, parsed, handler=None):
@@ -46,11 +62,28 @@ def handle_arg(args, command, parsed, handler=None):
             handler(cls_name)
         case 2:
             try:
-                instance = parsed[1]
+                instance_id = parsed[1]
             except IndexError:
                 print("** instance id missing **")
                 return
-            handler(cls_name, instance)
+            handler(cls_name, instance_id)
+        case 4:
+            try:
+                instance_id = parsed[1]
+            except IndexError:
+                print("** instance id missing **")
+                return
+            try:
+                field_key = parsed[2]
+            except IndexError:
+                print("** attribute name missing **")
+                return
+            try:
+                field_value = parsed[3]
+            except IndexError:
+                print("** value missing **")
+                return
+            handler(cls_name, instance_id, field_key, field_value)
         case _:
             pass
 
@@ -116,6 +149,19 @@ def handle_all(cls_name):
     print(res_array)
 
 
+def handle_update(cls_name, id, key, value):
+    """this handles the updating of fields of an entry
+        in the JSON file"""
+    res_key = f"{cls_name}.{id}"
+    try:
+        _ = storage.all()[res_key]
+    except KeyError:
+        print("** no instance found **")
+        return
+    setattr(storage.all()[res_key], str(key), value)
+    storage.save()
+
+
 class CompletionClass(cmd.Cmd):
     """auto-completion class for the HbnbCommand class"""
 
@@ -133,4 +179,8 @@ class CompletionClass(cmd.Cmd):
 
     def complete_destroy(self, text, line, _, __):
         """auto-completion for destroy command"""
+        return suggest(text, line)
+
+    def complete_update(self, text, line, _, __):
+        """auto-completion for update command"""
         return suggest(text, line)

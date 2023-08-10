@@ -19,19 +19,27 @@ class BaseModel:
     """a class that defines a base model"""
     def __init__(self, *_, **kwargs):
         """the constructor function"""
-        if (kwargs and kwargs.items()):
-            create_value = kwargs.__getitem__("created_at")
-            create_id = kwargs.__getitem__("id")
-            if (is_uuid_valid(create_id)):
-                self.id = create_id
-            if (create_value and type(create_value) == str):
-                self.created_at = datetime.datetime.fromisoformat(create_value)
-            self.updated_at = self.created_at
+        if kwargs or kwargs.items():
+            for key, value in kwargs.items():
+                if key == "__class__":
+                    continue
+                if key == "created_at":
+                    if (value and type(value) == str):
+                        self.created_at = datetime.datetime.fromisoformat(value)
+                        self.updated_at = self.created_at
+                if key == "id":
+                    if (is_uuid_valid(value)):
+                        self.id = value
+            if "id" not in kwargs.keys():
+                self.id = str(uuid.uuid4())
+            if "created_at" not in kwargs.keys():
+                self.created_at = datetime.datetime.now()
+                self.updated_at = self.created_at
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.datetime.now()
             self.updated_at = self.created_at
-            models.storage.new(self)
+        models.storage.new(self)
 
     def save(self):
         """a public instance method that updates the

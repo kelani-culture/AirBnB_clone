@@ -38,6 +38,12 @@ class HbnbCommand(CompletionClass):
         parsed = line.split()
         handle_arg(0, "all", parsed, handle_all)
 
+    def do_update(self, line):
+        """this delegates the updating of fields
+            of the entries in the storage file"""
+        parsed = line.split()
+        handle_arg(4, "update", parsed, handle_update)
+
     def do_quit(self, line):
         """exit handler for the cmd loop"""
         sys.exit()
