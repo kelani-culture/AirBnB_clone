@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """A module that implements the command line"""
 
 from models.base_model import BaseModel

@@ -1,11 +1,9 @@
+#!/usr/bin/env python3
 """a module that defines a FileStorage class"""
 import json
 from models.base_model import BaseModel
-<<<<<<< HEAD
 from models.user import User
-=======
 import datetime
->>>>>>> b2a762a (implemented auto-completion for the CRUD commands(all, show, ...) and made a bug-fix)
 
 
 def file_exists(file_str):
@@ -34,11 +32,7 @@ class FileStorage:
 
     def all(self):
         """a public instance method that returns all objects"""
-<<<<<<< HEAD
-        return self.__objects #{key: val.to_dict() for key, val in self.__objects.items()}
-=======
         return FileStorage.__objects
->>>>>>> b2a762a (implemented auto-completion for the CRUD commands(all, show, ...) and made a bug-fix)
 
     def new(self, obj):
         """adds an instance to the FileStorage.__objects
@@ -68,13 +62,5 @@ class FileStorage:
             for key, value in FileStorage.__objects.items():
                 class_str = key.split(".")[0]
                 instance = globals()[class_str](**value)
-<<<<<<< HEAD
-
-                for attr_name, attr_value in value.items():
-                    if attr_name not in ['id', 'updated_at', 'created_at', '__class__']:
-                        setattr(instance, attr_name, attr_value)
-                self.__objects[key] = instance
-=======
->>>>>>> b2a762a (implemented auto-completion for the CRUD commands(all, show, ...) and made a bug-fix)
                 FileStorage.__objects[key] = instance
         return FileStorage.__objects
