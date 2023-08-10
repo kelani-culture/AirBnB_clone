@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """A module that implements the command line"""
 
 from models.base_model import BaseModel
@@ -6,6 +6,8 @@ from models import storage
 from models.user import User
 import cmd
 import sys
+
+completion_classes = ["BaseModel", "State", "City", "Place", "User"]
 
 
 def handle_arg(args, command, parsed, handler=None):
@@ -50,6 +52,16 @@ def handle_arg(args, command, parsed, handler=None):
             pass
 
 
+def suggest(text, line):
+    """comes up with auto-completion based on the text passed in"""
+    if not text:
+        completions = completion_classes[:]
+    else:
+        completions = [item for
+                       item in completion_classes if item.startswith(text)]
+    return completions
+
+
 def handle_create(cls_name):
     """this handles the creation of new instances and writing
         to a JSON file"""
@@ -81,33 +93,46 @@ def handle_destroy(cls_name, id):
     except KeyError:
         print("** no instance found **")
         return
-    del res_objs[key]
+    del storage.all()[key]
+    storage.save()
 
 
 def handle_all(cls_name):
     """this handles the printing of the string representation of all
         instances based or not on the class name"""
-    # if not cls_name:
-    #     res_insts = {key: value for key,
-    #                  value in storage.all().items()}
-    # else:
-    #     res_insts = {key: value for key,
-    #                  value in storage.all().items()
-    #                  if key.startswith(cls_name)}
-    # print(res_insts)
-    # for key, value in res_insts.items():
-    #     class_str = key.split(".")[0]
-    #     instance = globals()[class_str](**value)
-    #     res_insts[key] = instance.__str__()
-    # res_array = [value for key, value in res_insts.items()]
-    store_attr = []
-    all_attr = storage.all()
-    for attr_id in all_attr.keys():
-        attr = all_attr[attr_id]
-        store_attr.append(attr.__str__())
-    print(store_attr)
+    if not cls_name:
+        res_insts = {key: value for key,
+                     value in storage.all().items()}
+    else:
+        res_insts = {key: value for key,
+                     value in storage.all().items()
+                     if key.startswith(cls_name)}
+    res_array = []
+    for key, value in res_insts.items():
+        res_array.append(value.__str__())
+    print(res_array)
 
-class HbnbCommand(cmd.Cmd):
+class CompletionClass(cmd.Cmd):
+    """auto-completion class for the HbnbCommand class"""
+
+    def complete_create(self, text, line, _, __):
+        """auto-completion for all command"""
+        return suggest(text, line)
+
+    def complete_show(self, text, line, _, __):
+        """auto-completion for show command"""
+        return suggest(text, line)
+
+    def complete_all(self, text, line, _, __):
+        """auto-completion for all command"""
+        return suggest(text, line)
+
+    def complete_destroy(self, text, line, _, __):
+        """auto-completion for destroy command"""
+        return suggest(text, line)
+
+
+class HbnbCommand(CompletionClass):
     """Implementation of the command line
         intepreter"""
     prompt = "(hbnb) "

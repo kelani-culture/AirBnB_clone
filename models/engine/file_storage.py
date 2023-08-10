@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
 """a module that defines a FileStorage class"""
 import json
 from models.base_model import BaseModel
 from models.user import User
+import datetime
 
 
 def file_exists(file_str):
@@ -30,13 +32,12 @@ class FileStorage:
 
     def all(self):
         """a public instance method that returns all objects"""
-        return self.__objects #{key: val.to_dict() for key, val in self.__objects.items()}
+        return FileStorage.__objects
 
     def new(self, obj):
         """adds an instance to the FileStorage.__objects
             dictionary"""
         key = f"{obj.__class__.__name__}.{obj.id}"
-        self.__objects[key] = obj
         FileStorage.__objects[key] = obj
 
     def save(self):
@@ -44,14 +45,11 @@ class FileStorage:
             to a file"""
         json_obj = {key: item.to_dict() for key,
                     item in FileStorage.__objects.items()}
-        if not json_obj:
-            with open(FileStorage.__file_path, mode="w",
-                      encoding="utf-8") as file:
-                return json.dump({}, file)
-        else:
-            with open(FileStorage.__file_path, mode="w",
-                      encoding="utf-8") as file:
-                json.dump(json_obj, file)
+        if not json_obj or not json_obj.items():
+            return
+        with open(FileStorage.__file_path, mode="w",
+                  encoding="utf-8") as file:
+            json.dump(json_obj, file)
 
     def reload(self):
         """a public instance methods that deserializes a JSON file
@@ -64,10 +62,11 @@ class FileStorage:
             for key, value in FileStorage.__objects.items():
                 class_str = key.split(".")[0]
                 instance = globals()[class_str](**value)
-
-                for attr_name, attr_value in value.items():
-                    if attr_name not in ['id', 'updated_at', 'created_at', '__class__']:
-                        setattr(instance, attr_name, attr_value)
-                self.__objects[key] = instance
+                instance.__dict__.update({_key: item for _key,
+                                          item in value.items()
+                                          if item not in instance.__dict__.values()})
+                instance.created_at = datetime.datetime.fromisoformat(instance.created_at)
+                instance.updated_at = datetime.datetime.fromisoformat(instance.updated_at)
+                del instance.__dict__["__class__"]
                 FileStorage.__objects[key] = instance
-        return self.__objects
+        return FileStorage.__objects
