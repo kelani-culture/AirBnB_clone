@@ -14,7 +14,7 @@ for obj_id in all_objs.keys():
     print(obj)
 
 print("-- Create a new object --")
-my_model = BaseModel()
+my_model = BaseModel(name=1.1)
 my_model.name = "My_First_Model"
 my_model.my_number = 89
 my_model.save()
