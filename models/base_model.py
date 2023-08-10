@@ -45,18 +45,13 @@ class BaseModel:
         all_attrs = {
                 key: value
                 for key, value in self.__dict__.items()
-                if not key.startswith("_")
             }
         all_attrs.update({"__class__": self.__class__.__name__})
         all_attrs.update({"created_at":
-                          str(self.created_at.strftime("%Y-%m-%dT%H:%M:%S.%f"))
-                    })
+                          self.created_at.isoformat()})
         all_attrs.update({"updated_at":
-                          str(self.updated_at.strftime("%Y-%m-%dT%H:%M:%S.%f"))
-                    })
-        # getting ordered dictionary back in case the checker checks for output
-        # the __class__ key keep getting omitted since its not part of the attribute
-        return all_attrs #{key: all_attrs[key] for key in vars(self).keys()}
+                          self.updated_at.isoformat()})
+        return all_attrs
 
     def __str__(self):
         """a magic method that returns the printable
