@@ -2,6 +2,7 @@
 """A module that implements the command line"""
 
 from models.base_model import BaseModel
+from models.console_utils import *
 from models import storage
 from models.user import User
 import cmd

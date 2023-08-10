@@ -45,8 +45,6 @@ class FileStorage:
             to a file"""
         json_obj = {key: item.to_dict() for key,
                     item in FileStorage.__objects.items()}
-        if not json_obj or not json_obj.items():
-            return
         with open(FileStorage.__file_path, mode="w",
                   encoding="utf-8") as file:
             json.dump(json_obj, file)
