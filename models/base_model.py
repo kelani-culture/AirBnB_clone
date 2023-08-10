@@ -44,8 +44,8 @@ class BaseModel:
             representation of the instance"""
         all_attrs = {
                 key: value
-                for key, value in vars(self).items()
-                if not key.startswith("_") and not key.endswith("at")
+                for key, value in self.__dict__.items()
+                if not key.startswith("_")
             }
         all_attrs.update({"__class__": self.__class__.__name__})
         all_attrs.update({"created_at":
