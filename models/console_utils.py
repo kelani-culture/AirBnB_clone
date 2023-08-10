@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 """a module that defines utility functions for the console module"""
 
-from . import base_model
-from . import user
+from . import amenity, base_model, city
+from . import place, review, state
+from . import storage, user
 import cmd
 import re
-from . import storage
-from . import place, city, review, amenity
 
 # globals
-BaseModel = base_model.BaseModel
-User = user.User
-Place = place.Place
-City = city.City
-Review = review.Review
 Amenity = amenity.Amenity
-completion_classes = ["BaseModel", "State", "City", "Place",
-                      "User", "Amenity", "Review"
-                     ]
+BaseModel = base_model.BaseModel
+City = city.City
+Place = place.Place
+Review = review.Review
+State = state.State
+User = user.User
+completion_classes = ["BaseModel", "State", "City",
+                      "Amenity", "Place", "User", "Review"]
 
 
 def derive_type_from_string(string: str):

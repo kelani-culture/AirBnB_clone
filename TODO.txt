@@ -2,3 +2,4 @@ task 5 is not fully tested and neither is it complete [completed]
 we may face checker issues with our command line interpreter implementation.
 	areas to check:
 		- the prompt, toggle a space to check for changes in the checker
+resolve the global() variable in filestorage to recognize all other sub-classes - basically importing
