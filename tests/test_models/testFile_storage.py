@@ -19,7 +19,7 @@ class TestFileStorage_base(unittest.TestCase):
         # Create a temporary directory for testing
         cls.temp_dir = tempfile.TemporaryDirectory()
         # Set the temporary directory as the file storage path
-        models.storage.__file_path = os.path.join(cls.temp_dir.name, "file.json")
+        models.storage.__file_path = os.path.join(cls.temp_dir.name, "test_file.json")
 
     @classmethod
     def tearDown(cls):
