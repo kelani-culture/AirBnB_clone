@@ -94,6 +94,26 @@ def handle_arg(args, command, parsed, handler=None):
             pass
 
 
+def parse_and_handle_arg(cls: str, method: str, raw_arg: str, handler) -> None:
+    """
+    parse_and_handle_arg - this parses the passed argument,
+    validates it and handles it
+    it's always going to be in the format:
+        cls.method([raw_arg])
+    Parameters:
+        cls: the class name
+        method: the method name
+        raw_arg: the unparsed arguments
+    Returns:
+        None
+    """
+    if not raw_arg:
+        print("no argument")
+        print(f"class: {cls}, method: {method}")
+    else:
+        print(f"class: {cls}, method: {method}, arg: {raw_arg}")
+
+
 def suggest(text, line):
     """comes up with auto-completion based on the text passed in"""
     if not text:

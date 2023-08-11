@@ -49,6 +49,14 @@ class BaseModel:
         self.updated_at = datetime.datetime.now()
         models.storage.save()
 
+    def update(self, *args, **kwargs):
+        """a public instance method that updates or adds a new attribute
+            to the instance"""
+        if args and len(args) % 2 == 0:
+            pass
+        if kwargs and kwargs.items():
+            pass
+
     def to_dict(self):
         """a public instance method that returns the dictionary
             representation of the instance"""

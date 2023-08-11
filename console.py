@@ -56,8 +56,11 @@ class HbnbCommand(CompletionClass):
     def default(self, line):
         """overrides the default behavior of the class when
             a wrong command format is parsed"""
-        # use regex
-        pass
+        raw = re.findall(r"^(\w+)\.(\w+)\((.*)\)$", line)
+        if not raw:
+            return
+        cls_raw, method_raw, arg_raw = raw[0]
+        # parse_and_handle_arg(cls_raw, method_raw, arg_raw)
 
     def emptyline(self):
         """handles the enter key"""
