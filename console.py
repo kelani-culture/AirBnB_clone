@@ -6,6 +6,7 @@ from models.console_utils import *
 from models import storage
 from models.user import User
 import cmd
+import re
 import sys
 
 
@@ -48,13 +49,23 @@ class HbnbCommand(CompletionClass):
         """exit handler for the cmd loop"""
         sys.exit()
 
-    def help_quit(self):
-        """provides guide for the quit command"""
-        print("Quit command to exit the program")
-
     def do_EOF(self, line):
         """handles the CTRL+D key combs"""
         return True
+
+    def default(self, line):
+        """overrides the default behavior of the class when
+            a wrong command format is parsed"""
+        # use regex
+        pass
+
+    def emptyline(self):
+        """handles the enter key"""
+        pass
+
+    def help_quit(self):
+        """provides guide for the quit command"""
+        print("Quit command to exit the program")
 
 
 if __name__ == "__main__":
