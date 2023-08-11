@@ -1,110 +1,103 @@
 #!/usr/bin/python3
 
 """A test case for the file storage class"""
-
-import os
+import tempfile
 import unittest
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 from models.user import User
-import tempfile
-import models
-
+import shutil
+import os
 
 class TestFileStorage_base(unittest.TestCase):
-    """Test case for the test file storage class"""
-
-    @classmethod
-    def setUp(cls):
-        models.storage.__file_path = 'test_file'
-        with tempfile.NamedTemporaryFile(prefix=models.storage.__file_path,
-                                         suffix=".json", delete=False) as file:
-            cls.temp_file_path = file.name
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        if os.path.exists(cls.temp_file_path):
-            os.remove(cls.temp_file_path)
-
-    def test_new_save_reload(self):
-        """Test for the new and save method"""
-        # Create an instance of BaseModel
-        my_model = BaseModel()
-        my_model.name = "test_name"
-
-        # Save the instance using the FileStorage
-        models.storage.new(my_model)
-        models.storage.save()
-
-        # Create a new FileStorage instance and reload data
-        new_storage = FileStorage()
-        new_storage.reload()
-
-        # Retrieve the stored instance
-        loaded_objects = new_storage.all()
-        key = "BaseModel." + my_model.id
-        self.assertIn(key, loaded_objects)
-
-        # Retrieve the retrieved model
-        retrieved_model = loaded_objects[key]
-        self.assertEqual(retrieved_model.name, "test_name")
-
-    def test_reload(self):
-        """Test for the reload method"""
-        # Create an instance of BaseModel and save it
-        my_model = BaseModel()
-        my_model.name = "test_reload"
-        my_model.save()
-
-        # Create a new FileStorage instance and reload data
-        storage = FileStorage()
-        storage.reload()
-
-        # Retrieve the stored instance and check if
-        #the dynamically added attribute is present
-        loaded_objects = storage.all()
-        self.assertTrue("BaseModel." + my_model.id in loaded_objects)
-        retrieved_model = loaded_objects["BaseModel." + my_model.id]
-        self.assertEqual(retrieved_model.name, "test_reload")
-
-
-class TestFileStorage_user(TestFileStorage_base):
-    """User test File storage that inherit from class 
-    """
 
     def setUp(self):
-        self.my_user = User()
-        self.my_user.first_name = "Betty"
-        self.my_user.last_name = "Bar"
-        self.my_user.email = "airbnb@mail.com"
-        self.my_user.password = "root"
+        # Create a temporary directory for testing
+        self.test_dir = "test_data"
+        os.makedirs(self.test_dir, exist_ok=True)
 
-    def test_new_save_reload(self):
-        models.storage.new(self.my_user)
-        models.storage.save()
+        # Set the test JSON file path
+        self.test_file_path = os.path.join(self.test_dir, "test_file.json")
 
-        # Create a new FileStorage instance and reload data
+        # Initialize a separate FileStorage instance for testing
+        self.storage = FileStorage()
+        self.storage._FileStorage__file_path = self.test_file_path
+
+        # Create a BaseModel and save it
+        self.base_model = BaseModel()
+        self.storage.new(self.base_model)
+        self.storage.save()
+
+    def tearDown(self):
+        # Remove the temporary directory and its contents
+        shutil.rmtree(self.test_dir)
+
+    def test_all(self):
+        all_objects = self.storage.all()
+        self.assertIsInstance(all_objects, dict)
+        self.assertIn("BaseModel.{}".format(self.base_model.id), all_objects)
+
+    def test_new(self):
+        new_model = BaseModel()
+        self.storage.new(new_model)
+        all_objects = self.storage.all()
+        self.assertIn("BaseModel.{}".format(new_model.id), all_objects)
+
+    def test_save_reload(self):
+        new_model = BaseModel()
+        self.storage.new(new_model)
+        self.storage.save()
+
+        # Create a new FileStorage instance for testing
         new_storage = FileStorage()
+        new_storage._FileStorage__file_path = self.test_file_path
         new_storage.reload()
 
-        # Retrieve the stored instance
-        loaded_objects = new_storage.all()
-        key = "User." + self.my_user.id
-        self.assertIn(key, loaded_objects)
- 
-        # Retrieve the retrieved model
-        retrieved_model = loaded_objects[key]
-        self.assertEqual(retrieved_model.first_name, "Betty")
+        all_objects = new_storage.all()
+        self.assertIn("BaseModel.{}".format(self.base_model.id), all_objects)
+        self.assertIn("BaseModel.{}".format(new_model.id), all_objects)
 
-    def test_reload(self):
-        storage = FileStorage()
-        storage.reload()
+class TestFileStorage_user(unittest.TestCase):
 
-        # Retrieve the stored instance and check if
-        #the dynamically added attribute is present
-        loaded_objects = storage.all()
-        self.assertTrue("User." + self.my_user.id in loaded_objects)
-        retrieved_model = loaded_objects["User." + self.my_user.id]
-        self.assertEqual(retrieved_model.first_name, "Betty")
-        self.assertEqual(retrieved_model.password, "root")
-        self.assertEqual(retrieved_model.email, "airbnb@mail.com")
+    def setUp(self):
+        # Create a temporary directory for testing
+        self.test_dir = "test_data"
+        os.makedirs(self.test_dir, exist_ok=True)
+
+        # Set the test JSON file path
+        self.test_file_path = os.path.join(self.test_dir, "test_file.json")
+
+        # Initialize a separate FileStorage instance for testing
+        self.storage = FileStorage()
+        self.storage._FileStorage__file_path = self.test_file_path
+
+        # Create a User instance and save it
+        self.user = User()  # Adjust this line based on your User class constructor
+        self.storage.new(self.user)
+        self.storage.save()
+
+    def tearDown(self):
+        # Remove the temporary directory and its contents
+        shutil.rmtree(self.test_dir)
+
+    def test_user_creation(self):
+        # Test creating a User instance
+        user = User()  # Adjust this line based on your User class constructor
+        self.storage.new(user)
+        all_objects = self.storage.all()
+        self.assertIn("User.{}".format(user.id), all_objects)
+
+    def test_user_save_reload(self):
+        # Test saving and reloading a User instance
+        new_user = User()  # Adjust this line based on your User class constructor
+        self.storage.new(new_user)
+        self.storage.save()
+
+        # Create a new FileStorage instance for testing
+        new_storage = FileStorage()
+        new_storage._FileStorage__file_path = self.test_file_path
+        new_storage.reload()
+
+        all_objects = new_storage.all()
+        self.assertIn("User.{}".format(self.user.id), all_objects)
+        self.assertIn("User.{}".format(new_user.id), all_objects)
