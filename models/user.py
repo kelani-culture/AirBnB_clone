@@ -8,6 +8,7 @@ class User(BaseModel):
     password: str = ""
     first_name: str = ""
     last_name: str = ""
+    count = 0
 
     def __init__(self, *_, **kwargs):
         """the constructor function"""
@@ -16,6 +17,7 @@ class User(BaseModel):
         self.first_name = User.first_name
         self.last_name = User.last_name
         self.email = User.email
+        User.count += 1
 
     def to_dict(self):
         """a public instance method that returns the dictionary

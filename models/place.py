@@ -16,6 +16,7 @@ class Place(BaseModel):
     latitude: float = 0.0
     longitude: float = 0.0
     amenity_ids: list = []
+    count = 0
 
     def __init__(self, *_, **kwargs):
         """the constructor function"""
@@ -30,6 +31,7 @@ class Place(BaseModel):
         self.latitude = Place.latitude
         self.longitude = Place.longitude
         self.amenity_ids = Place.amenity_ids
+        Place.count += 1
 
     def to_dict(self):
         """a public instance method that returns the dictionary

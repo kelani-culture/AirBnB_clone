@@ -7,12 +7,14 @@ class City(BaseModel):
     """city class"""
     state_id: str = ""
     name: str = ""
+    count = 0
 
     def __init__(self, *_, **kwargs):
         """the constructor function"""
         super().__init__(**kwargs)
         self.state_id = City.state_id
         self.name = City.name
+        City.count += 1
 
     def to_dict(self):
         """a public instance method that returns the dictionary

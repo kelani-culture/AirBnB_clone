@@ -17,6 +17,8 @@ def is_uuid_valid(uuid_string):
 
 class BaseModel:
     """a class that defines a base model"""
+    count = 0
+
     def __init__(self, *_, **kwargs):
         """the constructor function"""
         if kwargs or kwargs.items():
@@ -42,6 +44,7 @@ class BaseModel:
             self.created_at = datetime.datetime.now()
             self.updated_at = self.created_at
         models.storage.new(self)
+        BaseModel.count += 1
 
     def save(self):
         """a public instance method that updates the
@@ -49,13 +52,15 @@ class BaseModel:
         self.updated_at = datetime.datetime.now()
         models.storage.save()
 
-    def update(self, *args, **kwargs):
-        """a public instance method that updates or adds a new attribute
-            to the instance"""
-        if args and len(args) % 2 == 0:
-            pass
-        if kwargs and kwargs.items():
-            pass
+    # def update(self, *args, **kwargs):
+    #     """a public instance method that updates or adds a new attribute
+    #         to the instance"""
+    #     print("dictionaries\n")
+    #     print(models.storage.all())
+    #     if args and len(args) % 2 == 0:
+    #         pass
+    #     elif kwargs and kwargs.items():
+    #         pass
 
     def to_dict(self):
         """a public instance method that returns the dictionary

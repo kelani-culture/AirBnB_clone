@@ -9,11 +9,13 @@ class State(BaseModel):
         name - name of the state
     """
     name: str = ""
+    count = 0
 
     def __init__(self, *_, **kwargs):
         """the constructor function"""
         super().__init__(**kwargs)
         self.name = State.name
+        State.count += 1
 
     def to_dict(self):
         """a public instance method that returns the dictionary

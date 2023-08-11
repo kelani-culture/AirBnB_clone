@@ -94,7 +94,7 @@ def handle_arg(args, command, parsed, handler=None):
             pass
 
 
-def parse_and_handle_arg(cls: str, method: str, raw_arg: str, handler) -> None:
+def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
     """
     parse_and_handle_arg - this parses the passed argument,
     validates it and handles it
@@ -107,11 +107,33 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str, handler) -> None:
     Returns:
         None
     """
-    if not raw_arg:
-        print("no argument")
-        print(f"class: {cls}, method: {method}")
-    else:
-        print(f"class: {cls}, method: {method}, arg: {raw_arg}")
+    if cls not in completion_classes:
+        return
+    cls_key = ""
+    arg_extractor = CmdArgToken()
+    # if method in globals()[cls].__dict__.keys():
+    match method:
+        case "all":
+            handle_all(cls)
+        case "show":
+            id = arg_extractor.get_arg_str(raw_arg)
+            if id and len(id) > 1:
+                handle_show(cls, id[1])
+        case "count":
+            handle_count(cls)
+        case "update":
+            #     if args and len(args) % 2 == 0:
+            print("handling update")
+        case "destroy":
+            print("handling destroy")
+        case _:
+            return
+
+    # if not raw_arg:
+    #     print("no argument")
+    #     print(f"class: {cls}, method: {method}")
+    # else:
+    #     print(f"class: {cls}, method: {method}, arg: {raw_arg}")
 
 
 def suggest(text, line):
@@ -186,6 +208,33 @@ def handle_update(cls_name, id, key, value):
         return
     setattr(storage.all()[res_key], str(key), value)
     storage.save()
+
+
+def handle_count(cls_name):
+    """this handles counting the number of instances created
+        based on a class"""
+    count = globals()[cls_name].__dict__["count"]
+    print(count)
+
+
+class CmdArgToken():
+    """a class that resolves a parsed command line argument
+        to it's logical values"""
+    def get_arg_str(self, line) -> list:
+        """this resolves the argument to a string only"""
+        arg_str_arr = re.findall(r"^(\"|\')([\w-]+)\1", line)
+        if not arg_str_arr:
+            print("invalid first argument!")
+            return []
+        return arg_str_arr[0]
+
+    def get_arg_str_and_arg(self, line) -> list:
+        """this resolves the argument to a string and comma-separated values"""
+        return []
+
+    def get_arg_str_and_kwarg(self, line) -> list:
+        """this resolves the argument to a string and key-value pairs"""
+        return []
 
 
 class CompletionClass(cmd.Cmd):

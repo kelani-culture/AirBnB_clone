@@ -10,6 +10,7 @@ class Review(BaseModel):
     place_id: str = ""
     user_id: str = ""
     text: str = ""
+    count = 0
 
     def __init__(self, *_, **kwargs):
         """the constructor function"""
@@ -17,6 +18,7 @@ class Review(BaseModel):
         self.place_id = Review.place_id
         self.user_id = Review.user_id
         self.text = Review.text
+        Review.count += 1
 
     def to_dict(self):
         """a public instance method that returns the dictionary
