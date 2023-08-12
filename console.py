@@ -86,15 +86,21 @@ class HbnbCommand(CompletionClass):
         if not raw:
             return
         cls_raw, method_raw, arg_raw = raw[0]
-        parse_and_handle_arg(cls_raw, method_raw, arg_raw)
+        if not parse_and_handle_arg(cls_raw, method_raw, arg_raw):
+            super().default(line)
 
     def emptyline(self):
         """handles the enter key"""
         pass
 
     def help_quit(self):
-        """provides guide for the quit command"""
-        print("Quit command to exit the program")
+        """
+        Display help information for the quit command.
+        """
+        print("\nUsage: quit\n")
+        print("This command allows you to exit the cmd\
+                interpreter.", end=" ")
+        print()
 
 
 if __name__ == "__main__":

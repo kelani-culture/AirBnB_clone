@@ -93,7 +93,7 @@ def handle_arg(args, command, parsed, handler=None):
         pass
 
 
-def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
+def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> bool:
     """
     parse_and_handle_arg - this parses the passed argument,
     validates it and handles it
@@ -107,7 +107,7 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
         None
     """
     if cls not in completion_classes:
-        return
+        return False
     cls_key = ""
     arg_extractor = CmdArgToken()
 
@@ -117,6 +117,8 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
         id = arg_extractor.get_arg_str(raw_arg)
         if id and len(id) > 1:
             handle_show(cls, id[1])
+        else:
+            return False
     elif method == "count":
         handle_count(cls)
     elif method == "create":
@@ -125,19 +127,23 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
         result_list = arg_extractor.get_arg_str_and_arg(raw_arg)
         result_dict = arg_extractor.get_arg_str_and_kwarg(raw_arg)
         if (result_dict):
-            return
+            return True
         elif (result_list):
             first_key = [item for item in result_list.keys()][0]
             first_value = [item for item in result_list.values()][0]
             handle_parsed_update(cls, first_key, **first_value)
         else:
-            pass
+            return False
     elif method == "destroy":
         id = arg_extractor.get_arg_str(raw_arg)
         if id and len(id) > 1:
             handle_destroy(cls, id[1])
+        else:
+            return False
     else:
-        return
+        return False
+
+    return True
 
 
 def suggest(text, line):
