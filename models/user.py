@@ -19,6 +19,11 @@ class User(BaseModel):
         self.email = User.email
         User.count += 1
 
+    @staticmethod
+    def reduce():
+        """a public instance method that reduces the number of instances"""
+        User.count -= 1
+
     def to_dict(self):
         """a public instance method that returns the dictionary
             representation of the instance"""

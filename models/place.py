@@ -33,6 +33,11 @@ class Place(BaseModel):
         self.amenity_ids = Place.amenity_ids
         Place.count += 1
 
+    @staticmethod
+    def reduce():
+        """a public instance method that reduces the number of instances"""
+        Place.count -= 1
+
     def to_dict(self):
         """a public instance method that returns the dictionary
             representation of the instance"""

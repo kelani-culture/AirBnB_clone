@@ -44,6 +44,11 @@ class BaseModel:
             self.created_at = datetime.datetime.now()
             self.updated_at = self.created_at
         models.storage.new(self)
+
+    @staticmethod
+    def reduce():
+        """a public instance method that reduces the number of instances"""
+        BaseModel.count -= 1
         BaseModel.count += 1
 
     def save(self):

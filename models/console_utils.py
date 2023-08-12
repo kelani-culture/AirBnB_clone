@@ -121,21 +121,21 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
                 handle_show(cls, id[1])
         case "count":
             handle_count(cls)
+        case "create":
+            handle_create(cls)
         case "update":
             #     if args and len(args) % 2 == 0:
-            print("handling update")
+            result = arg_extractor.get_arg_str_and_arg(raw_arg)
+            if (result):
+                first_key = [item for item in result.keys()][0]
+                first_value = [item for item in result.values()][0]
+                handle_parsed_update(cls, first_key, **first_value)
         case "destroy":
-            destroy_id = arg_extractor.get_arg_str(raw_arg)
-            if destroy_id and len(destroy_id) > 1:
-                handle_destroy(cls, destroy_id[1])
+            id = arg_extractor.get_arg_str(raw_arg)
+            if id and len(id) > 1:
+                handle_destroy(cls, id[1])
         case _:
             return
-
-    # if not raw_arg:
-    #     print("no argument")
-    #     print(f"class: {cls}, method: {method}")
-    # else:
-    #     print(f"class: {cls}, method: {method}, arg: {raw_arg}")
 
 
 def suggest(text, line):
@@ -180,6 +180,7 @@ def handle_destroy(cls_name, id):
         print("** no instance found **")
         return
     del res_objs[key]
+    globals()[cls_name].reduce()
     storage.save()
 
 
@@ -211,15 +212,26 @@ def handle_update(cls_name, id, key, value):
     setattr(storage.all()[res_key], str(key), value)
     storage.save()
 
+def handle_parsed_update(cls_name, id, **kwargs):
+    """this handles the updating of fields of an entry
+        in the JSON file as manually parsed from the command line"""
+    res_key = f"{cls_name}.{id}"
+    try:
+        _ = storage.all()[res_key]
+    except KeyError:
+        print("** no instance found **")
+        return
+    for key, value in kwargs.items():
+        setattr(storage.all()[res_key], str(key), value)
+    print("successfully updated")
+    storage.save()
+
 
 def handle_count(cls_name):
     """this handles counting the number of instances created
         based on a class"""
     count = globals()[cls_name].__dict__["count"]
-    if count != len(storage.all()):
-        count -= 1
     print(count)
-
 
 
 class CmdArgToken():
@@ -227,15 +239,81 @@ class CmdArgToken():
         to it's logical values"""
     def get_arg_str(self, line) -> list:
         """this resolves the argument to a string only"""
-        arg_str_arr = re.findall(r"^(\"|\')([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})", line)
+        arg_str_arr = re.findall(r"^(\"|\')([\w-]+)\1", line)
         if not arg_str_arr:
-            print("** no instance found **")
+            print("invalid first argument!")
             return []
         return arg_str_arr[0]
 
-    def get_arg_str_and_arg(self, line) -> list:
-        """this resolves the argument to a string and comma-separated values"""
-        return []
+    def get_arg_str_and_arg(self, line) -> dict:
+        """
+        this resolves the argument to a string and comma-separated values
+        based on the assumption that values will
+        either be strings, numbers or array of strings only
+        while keys will be strings only
+        """
+        split_tok = re.finditer(r"((([^,]+))\s*,?\s*)|(\[.*\])", line)
+        split_tok = [i.group() for i in split_tok]
+        join = False
+        failed = False
+        arg_list = []
+        tmp_list = []
+        for tok in split_tok:
+            test_contain = re.findall(r"\[\s*(\"|\')([\w\@]+)\1\s*\]", tok)
+            if (test_contain):
+                tmp_list.append(test_contain[0][1])
+                arg_list.append(tmp_list)
+                tmp_list = []
+                join = False
+                continue
+            test_open = re.findall(r"\[\s*(\"|\')([\w\@]+)\1\s*,\s*", tok)
+            if test_open:
+                tmp_list.append(test_open[0][1])
+                join = True
+                continue
+            if join:
+                test_close = re.findall(r"\s*(\"|\')([\w\@]+)\1\s*\]\s*,?\s*", tok)
+                if test_close:
+                    tmp_list.append(test_close[0][1])
+                    join = False
+                    if tmp_list:
+                        arg_list.append(tmp_list)
+                        tmp_list = []
+                    continue
+                else:
+                    test_between = re.findall(r"\s*(\"|\')([\w\@]+)\1\s*,\s*", tok)
+                    if test_between:
+                        tmp_list.append(test_between[0][1])
+                        join = True
+            else:
+                test_str_dig = re.findall(r"\s*((\"|\')([\w\@-]+)\2)|(\d+)\s*", tok)
+                if test_str_dig:
+                    if not len(test_str_dig[0]) == 4:
+                        failed = True
+                        break
+                    if (test_str_dig[0][3]):
+                        empty_s = re.search("^\s*\"\s*$", test_str_dig[0][3])
+                        if empty_s:
+                            failed = True
+                            break
+                        arg_list.append(test_str_dig[0][3])
+                    else:
+                        arg_list.append(test_str_dig[0][2])
+        if not len(arg_list) % 2 or failed:
+            return {}
+        res_dict = []
+        res_list = arg_list[1:]
+        for idx, item in enumerate(res_list):
+            if type(item) == str:
+                dig_test = re.search(r"^\d+$", item)
+                if dig_test:
+                    res_list[idx] = int(item)
+        for idx, item in enumerate(res_list):
+            if idx % 2 == 0 or not idx:
+                res_dict.append((item, res_list[idx + 1]))
+        res = {arg_list[0]: dict(res_dict)}
+        return res
+
 
     def get_arg_str_and_kwarg(self, line) -> list:
         """this resolves the argument to a string and key-value pairs"""

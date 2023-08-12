@@ -20,6 +20,11 @@ class Review(BaseModel):
         self.text = Review.text
         Review.count += 1
 
+    @staticmethod
+    def reduce():
+        """a public instance method that reduces the number of instances"""
+        Review.count -= 1
+
     def to_dict(self):
         """a public instance method that returns the dictionary
             representation of the instance"""

@@ -68,8 +68,8 @@ class FileStorage:
                 instance.__dict__.update({_key: item for _key,
                                           item in value.items()
                                           if item not in instance.__dict__.values()})
-                instance.created_at = datetime.datetime.fromisoformat(str(instance.created_at))
-                instance.updated_at = datetime.datetime.fromisoformat(str(instance.updated_at))
+                instance.created_at = datetime.datetime.fromisoformat(instance.created_at)
+                instance.updated_at = datetime.datetime.fromisoformat(instance.updated_at)
                 del instance.__dict__["__class__"]
                 FileStorage.__objects[key] = instance
         return FileStorage.__objects
