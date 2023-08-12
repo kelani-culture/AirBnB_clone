@@ -103,6 +103,10 @@ class TestFileStorage_user(TestFileStorage_base):
         # Retrieve the stored instance and check if
         #the dynamically added attribute is present
         loaded_objects = storage.all()
+        print("class name and id ", self.__class__.__name__, self.my_user.id)
+        print("loaded objects")
+        print(loaded_objects)
+        print("======")
         self.assertTrue("User." + self.my_user.id in loaded_objects)
         retrieved_model = loaded_objects["User." + self.my_user.id]
         self.assertEqual(retrieved_model.first_name, "Betty")
