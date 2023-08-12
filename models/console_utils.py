@@ -291,7 +291,7 @@ class CmdArgToken():
                         tmp_list.append(test_between[0][1])
                         join = True
             else:
-                test_str_dig = re.findall(r"\s*((\"|\')([\w\@-]+)\2)|(\d+)\s*", tok)
+                test_str_dig = re.findall(r"\s*((\"|\')([\w\@-]+)\2)|([\d\.]+)\s*", tok)
                 if test_str_dig:
                     if not len(test_str_dig[0]) == 4:
                         failed = True
@@ -310,7 +310,7 @@ class CmdArgToken():
         res_list = arg_list[1:]
         for idx, item in enumerate(res_list):
             if type(item) == str:
-                dig_test = re.search(r"^\d+$", item)
+                dig_test = re.search(r"^[\d\.]+$", item)
                 if dig_test:
                     res_list[idx] = int(item)
         for idx, item in enumerate(res_list):
@@ -320,7 +320,12 @@ class CmdArgToken():
         return res
 
     def get_arg_str_and_kwarg(self, line) -> dict:
-        """this resolves the argument to a string and key-value pairs"""
+        """
+        this resolves the argument to a string and a dict of key-word args
+        based on the assumption that values will
+        either be strings or numbers only
+        while keys will be strings only
+        """
         failed = False
         split_tok = line.split(",")
         tmp_dict = {"key": "value"}
@@ -345,10 +350,12 @@ class CmdArgToken():
         else:
             failed = True
             return tmp_dict
-        print("kwarg tokens")
 
+        pairs_list = []
         for item in kwarg_tok:
-            print(item)
+            if len(item) != 2:
+                failed = True
+                break
             for spot in item:
                 test_empty = re.search(r"^\s*(\"|\')?\s*$", str(spot))
                 if test_empty:
@@ -359,45 +366,33 @@ class CmdArgToken():
         if failed:
             return tmp_dict
 
-        # extract arrays
-        # join = False
-        # test_contain = re.findall(r"\[\s*(\"|\')([\w\@]+)\1\s*\]", tok)
-        return tmp_dict
-
         # extract key-value pairs
         key_list = []
         value_list = []
         for idx, item in enumerate(kwarg_tok):
             for ind, tok in enumerate(item):
-                if ind % 2 == 0:
-                    test_key = re.findall(r"\s*((\"|\')([\w]+)\2)\s*", tok)
+                if ind == 0:
+                    print("key==")
+                    print(tok)
+                    test_key = re.findall(r"^\s*((\"|\')([\w]+)\2)\s*$", tok)
+                    if test_key:
+                        print(test_key[0])
                     key_list.append(tok)
                 else:
                     value_list.append(tok)
-                    test_val = re.findall(r"\s*((\[[^\[\]]*\])|(\d+)|((\"\')([\w\@-])+\5))\s*", tok)
-
-        for ind, tok in enumerate(key_list):
-            test_key = re.findall(r"\s*((\"|\')([\w]+)\2)\s*", tok)
-            print("token")
-            print(tok)
-            print("----------")
-            if (test_key):
-                print(test_key[0])
-
-        for ind, tok in enumerate(value_list):
-            test_val = re.findall(r"\s*((\[[^\[\]]*\])|(\d+)|((\"\')([\w\@-])+\5))\s*", tok)
-            print("token")
-            print(tok)
-            print("----------")
-            if test_val:
-                print(test_val[0])
-        print("+++++++++++++++++")
+                    print("value==")
+                    print(tok)
+                    test_val = re.match(r"^\s*([\d\.]+)|((\"|\')\s*([\w\@\.-])*\s*\3)\s*$", tok)
+                    if not test_val:
+                        test_val = re.match(r"\" John\"", tok)
+                        print(f"stubborn token .{tok}.")
+                    if test_val:
+                        print(test_val[0])
+                    else:
+                        print(f"re-token : {tok}")
 
         if failed:
             return tmp_dict
-        # for item in kwarg_tok:
-        #     print(item)
-
         return tmp_dict
 
 

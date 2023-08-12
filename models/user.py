@@ -13,10 +13,6 @@ class User(BaseModel):
     def __init__(self, *_, **kwargs):
         """the constructor function"""
         super().__init__(**kwargs)
-        self.password = User.password
-        self.first_name = User.first_name
-        self.last_name = User.last_name
-        self.email = User.email
         User.count += 1
 
     @staticmethod

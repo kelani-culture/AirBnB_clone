@@ -12,8 +12,6 @@ class City(BaseModel):
     def __init__(self, *_, **kwargs):
         """the constructor function"""
         super().__init__(**kwargs)
-        self.state_id = City.state_id
-        self.name = City.name
         City.count += 1
 
     @staticmethod

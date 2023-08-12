@@ -15,9 +15,6 @@ class Review(BaseModel):
     def __init__(self, *_, **kwargs):
         """the constructor function"""
         super().__init__(**kwargs)
-        self.place_id = Review.place_id
-        self.user_id = Review.user_id
-        self.text = Review.text
         Review.count += 1
 
     @staticmethod

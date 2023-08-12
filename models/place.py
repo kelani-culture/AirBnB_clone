@@ -21,16 +21,6 @@ class Place(BaseModel):
     def __init__(self, *_, **kwargs):
         """the constructor function"""
         super().__init__(**kwargs)
-        self.city_id = Place.city_id
-        self.user_id = Place.user_id
-        self.name = Place.name
-        self.description = Place.description
-        self.number_rooms = Place.number_rooms
-        self.max_guest = Place.max_guest
-        self.price_by_night = Place.price_by_night
-        self.latitude = Place.latitude
-        self.longitude = Place.longitude
-        self.amenity_ids = Place.amenity_ids
         Place.count += 1
 
     @staticmethod
