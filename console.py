@@ -20,7 +20,7 @@ class HbnbCommand(CompletionClass):
         try:
             super().cmdloop()
         except KeyboardInterrupt:
-            pass
+            print()
 
     def do_create(self, line):
         """this delegates the creation of new instances
@@ -73,6 +73,7 @@ class HbnbCommand(CompletionClass):
 
     def do_EOF(self, line):
         """handles the CTRL+D key combs"""
+        print()
         return True
 
     def default(self, line):
