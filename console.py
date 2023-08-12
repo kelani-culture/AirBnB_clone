@@ -15,6 +15,13 @@ class HbnbCommand(CompletionClass):
         intepreter"""
     prompt = "(hbnb) "
 
+    def cmdloop(self):
+        """handles CTRL+C"""
+        try:
+            super().cmdloop()
+        except KeyboardInterrupt:
+            pass
+
     def do_create(self, line):
         """this delegates the creation of new instances
             from passed in class names"""

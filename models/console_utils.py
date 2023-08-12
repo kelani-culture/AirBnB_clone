@@ -131,7 +131,7 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
             first_value = [item for item in result_list.values()][0]
             handle_parsed_update(cls, first_key, **first_value)
         else:
-            print("unhandled arg")
+            pass
     elif method == "destroy":
         id = arg_extractor.get_arg_str(raw_arg)
         if id and len(id) > 1:
@@ -243,7 +243,7 @@ class CmdArgToken():
         """this resolves the argument to a string only"""
         arg_str_arr = re.findall(r"^(\"|\')([\w-]+)\1", line)
         if not arg_str_arr:
-            print("invalid first argument!")
+            print("** instance id missing **")
             return []
         return arg_str_arr[0]
 
@@ -260,6 +260,9 @@ class CmdArgToken():
         failed = False
         arg_list = []
         tmp_list = []
+        if not split_tok:
+            print("** instance id missing **")
+            return {}
         for tok in split_tok:
             test_contain = re.findall(r"\[\s*(\"|\')([\w\@]+)\1\s*\]", tok)
             if (test_contain):
