@@ -61,37 +61,36 @@ def handle_arg(args, command, parsed, handler=None):
         print("** class name missing **")
         return
 
-    match args:
-        case 0:
-            handler(cls_name)
-        case 1:
-            handler(cls_name)
-        case 2:
-            try:
-                instance_id = parsed[1]
-            except IndexError:
-                print("** instance id missing **")
-                return
-            handler(cls_name, instance_id)
-        case 4:
-            try:
-                instance_id = parsed[1]
-            except IndexError:
-                print("** instance id missing **")
-                return
-            try:
-                field_key = parsed[2]
-            except IndexError:
-                print("** attribute name missing **")
-                return
-            try:
-                field_value = parsed[3]
-            except IndexError:
-                print("** value missing **")
-                return
-            handler(cls_name, instance_id, field_key, field_value)
-        case _:
-            pass
+    if args == 0:
+        handler(cls_name)
+    elif args == 1:
+        handler(cls_name)
+    elif args == 2:
+        try:
+            instance_id = parsed[1]
+        except IndexError:
+            print("** instance id missing **")
+            return
+        handler(cls_name, instance_id)
+    elif args == 4:
+        try:
+            instance_id = parsed[1]
+        except IndexError:
+            print("** instance id missing **")
+            return
+        try:
+            field_key = parsed[2]
+        except IndexError:
+            print("** attribute name missing **")
+            return
+        try:
+            field_value = parsed[3]
+        except IndexError:
+            print("** value missing **")
+            return
+        handler(cls_name, instance_id, field_key, field_value)
+    else:
+        pass
 
 
 def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
@@ -111,31 +110,34 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
         return
     cls_key = ""
     arg_extractor = CmdArgToken()
-    # if method in globals()[cls].__dict__.keys():
-    match method:
-        case "all":
-            handle_all(cls)
-        case "show":
-            id = arg_extractor.get_arg_str(raw_arg)
-            if id and len(id) > 1:
-                handle_show(cls, id[1])
-        case "count":
-            handle_count(cls)
-        case "create":
-            handle_create(cls)
-        case "update":
-            #     if args and len(args) % 2 == 0:
-            result = arg_extractor.get_arg_str_and_arg(raw_arg)
-            if (result):
-                first_key = [item for item in result.keys()][0]
-                first_value = [item for item in result.values()][0]
-                handle_parsed_update(cls, first_key, **first_value)
-        case "destroy":
-            id = arg_extractor.get_arg_str(raw_arg)
-            if id and len(id) > 1:
-                handle_destroy(cls, id[1])
-        case _:
+
+    if method == "all":
+        handle_all(cls)
+    elif method == "show":
+        id = arg_extractor.get_arg_str(raw_arg)
+        if id and len(id) > 1:
+            handle_show(cls, id[1])
+    elif method == "count":
+        handle_count(cls)
+    elif method == "create":
+        handle_create(cls)
+    elif method == "update":
+        result_list = arg_extractor.get_arg_str_and_arg(raw_arg)
+        result_dict = arg_extractor.get_arg_str_and_kwarg(raw_arg)
+        if (result_dict):
             return
+        elif (result_list):
+            first_key = [item for item in result_list.keys()][0]
+            first_value = [item for item in result_list.values()][0]
+            handle_parsed_update(cls, first_key, **first_value)
+        else:
+            print("unhandled arg")
+    elif method == "destroy":
+        id = arg_extractor.get_arg_str(raw_arg)
+        if id and len(id) > 1:
+            handle_destroy(cls, id[1])
+    else:
+        return
 
 
 def suggest(text, line):
@@ -212,6 +214,7 @@ def handle_update(cls_name, id, key, value):
     setattr(storage.all()[res_key], str(key), value)
     storage.save()
 
+
 def handle_parsed_update(cls_name, id, **kwargs):
     """this handles the updating of fields of an entry
         in the JSON file as manually parsed from the command line"""
@@ -223,7 +226,6 @@ def handle_parsed_update(cls_name, id, **kwargs):
         return
     for key, value in kwargs.items():
         setattr(storage.all()[res_key], str(key), value)
-    print("successfully updated")
     storage.save()
 
 
@@ -314,10 +316,86 @@ class CmdArgToken():
         res = {arg_list[0]: dict(res_dict)}
         return res
 
-
-    def get_arg_str_and_kwarg(self, line) -> list:
+    def get_arg_str_and_kwarg(self, line) -> dict:
         """this resolves the argument to a string and key-value pairs"""
-        return []
+        failed = False
+        split_tok = line.split(",")
+        tmp_dict = {"key": "value"}
+        if len(split_tok) <= 1:
+            failed = True
+
+        test_id = re.findall(r"\s*((\"|\')([\w-]+)\2)\s*", split_tok[0])
+        if not test_id:
+            failed = True
+            return tmp_dict
+        if failed:
+            return tmp_dict
+
+        arg_tok = ",".join(split_tok[1:])  # i doubt this splitting mechanism
+        print(arg_tok)
+        kwarg_raw = re.findall("^\s*\{(.*)\}\s*$", arg_tok)
+        kwarg_tok = []
+        if kwarg_raw:
+            kwarg_tok = kwarg_raw[0].split(",")
+            for idx, item in enumerate(kwarg_tok):
+                kwarg_tok[idx] = item.split(":")
+        else:
+            failed = True
+            return tmp_dict
+        print("kwarg tokens")
+
+        for item in kwarg_tok:
+            print(item)
+            for spot in item:
+                test_empty = re.search(r"^\s*(\"|\')?\s*$", str(spot))
+                if test_empty:
+                    failed = True
+                    break
+            if failed:
+                break
+        if failed:
+            return tmp_dict
+
+        # extract arrays
+        # join = False
+        # test_contain = re.findall(r"\[\s*(\"|\')([\w\@]+)\1\s*\]", tok)
+        return tmp_dict
+
+        # extract key-value pairs
+        key_list = []
+        value_list = []
+        for idx, item in enumerate(kwarg_tok):
+            for ind, tok in enumerate(item):
+                if ind % 2 == 0:
+                    test_key = re.findall(r"\s*((\"|\')([\w]+)\2)\s*", tok)
+                    key_list.append(tok)
+                else:
+                    value_list.append(tok)
+                    test_val = re.findall(r"\s*((\[[^\[\]]*\])|(\d+)|((\"\')([\w\@-])+\5))\s*", tok)
+
+        for ind, tok in enumerate(key_list):
+            test_key = re.findall(r"\s*((\"|\')([\w]+)\2)\s*", tok)
+            print("token")
+            print(tok)
+            print("----------")
+            if (test_key):
+                print(test_key[0])
+
+        for ind, tok in enumerate(value_list):
+            test_val = re.findall(r"\s*((\[[^\[\]]*\])|(\d+)|((\"\')([\w\@-])+\5))\s*", tok)
+            print("token")
+            print(tok)
+            print("----------")
+            if test_val:
+                print(test_val[0])
+        print("+++++++++++++++++")
+
+        if failed:
+            return tmp_dict
+        # for item in kwarg_tok:
+        #     print(item)
+
+        return tmp_dict
 
 
 class CompletionClass(cmd.Cmd):
