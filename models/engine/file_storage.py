@@ -63,6 +63,8 @@ class FileStorage:
                   encoding="utf-8") as f_ptr:
             FileStorage.__objects = json.load(f_ptr)
             for key, value in FileStorage.__objects.items():
+                if not value:
+                    continue
                 class_str = key.split(".")[0]
                 instance = globals()[class_str](**value)
                 instance.__dict__.update({_key: item for _key,
