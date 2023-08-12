@@ -125,7 +125,9 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> None:
             #     if args and len(args) % 2 == 0:
             print("handling update")
         case "destroy":
-            print("handling destroy")
+            destroy_id = arg_extractor.get_arg_str(raw_arg)
+            if destroy_id and len(destroy_id) > 1:
+                handle_destroy(cls, destroy_id[1])
         case _:
             return
 
@@ -214,7 +216,10 @@ def handle_count(cls_name):
     """this handles counting the number of instances created
         based on a class"""
     count = globals()[cls_name].__dict__["count"]
+    if count != len(storage.all()):
+        count -= 1
     print(count)
+
 
 
 class CmdArgToken():
@@ -222,9 +227,9 @@ class CmdArgToken():
         to it's logical values"""
     def get_arg_str(self, line) -> list:
         """this resolves the argument to a string only"""
-        arg_str_arr = re.findall(r"^(\"|\')([\w-]+)\1", line)
+        arg_str_arr = re.findall(r"^(\"|\')([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})", line)
         if not arg_str_arr:
-            print("invalid first argument!")
+            print("** no instance found **")
             return []
         return arg_str_arr[0]
 
