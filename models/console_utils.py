@@ -273,20 +273,21 @@ class CmdArgToken():
             print("** instance id missing **")
             return {}
         for tok in split_tok:
-            test_contain = re.findall(r"\[\s*(\"|\')([\w\@]+)\1\s*\]", tok)
+            test_contain = re.findall(r"\[\s*(\"|\')([\w\@\s]+)\1\s*\]", tok)
             if (test_contain):
                 tmp_list.append(test_contain[0][1])
                 arg_list.append(tmp_list)
                 tmp_list = []
                 join = False
                 continue
-            test_open = re.findall(r"\[\s*(\"|\')([\w\@]+)\1\s*,\s*", tok)
+            test_open = re.findall(r"\[\s*(\"|\')([\w\@\s]+)\1\s*,\s*", tok)
             if test_open:
                 tmp_list.append(test_open[0][1])
                 join = True
                 continue
             if join:
-                test_close = re.findall(r"\s*(\"|\')([\w\@]+)\1\s*\]\s*,?\s*", tok)
+                pattern = r"\s*(\"|\')([\w\@\s]+)\1\s*\]\s*,?\s*"
+                test_close = re.findall(pattern, tok)
                 if test_close:
                     tmp_list.append(test_close[0][1])
                     join = False
@@ -295,18 +296,20 @@ class CmdArgToken():
                         tmp_list = []
                     continue
                 else:
-                    test_between = re.findall(r"\s*(\"|\')([\w\@]+)\1\s*,\s*", tok)
+                    pattern = r"\s*(\"|\')([\w\@\s]+)\1\s*,\s*"
+                    test_between = re.findall(pattern, tok)
                     if test_between:
                         tmp_list.append(test_between[0][1])
                         join = True
             else:
-                test_str_dig = re.findall(r"\s*((\"|\')([\w\@-]+)\2)|([\d\.]+)\s*", tok)
+                pattern = r"\s*((\"|\')([\w\@\s-]+)\2)|([\d\.]+)\s*"
+                test_str_dig = re.findall(pattern, tok)
                 if test_str_dig:
                     if not len(test_str_dig[0]) == 4:
                         failed = True
                         break
                     if (test_str_dig[0][3]):
-                        empty_s = re.search("^\s*\"\s*$", test_str_dig[0][3])
+                        empty_s = re.search(r"^\s*\"\s*$", test_str_dig[0][3])
                         if empty_s:
                             failed = True
                             break
@@ -356,7 +359,39 @@ class CmdArgToken():
             return tmp_dict
         return res_tok
 
-class CompletionClass(cmd.Cmd):
+
+class HelpClass(cmd.Cmd):
+    """the class responsible for the description handling"""
+
+    def help_create(self):
+        """this provides the description for the 'create' do-handler"""
+        print("Usage:\t", end="")
+        print("create <class name>")
+
+    def help_show(self):
+        """this provides the description for the 'show' do-handler"""
+        print("Usage:\t", end="")
+        print("show <class name> <id>")
+
+    def help_all(self):
+        """this provides the description for the 'all' do-handler"""
+        print("Usage:\t", end="")
+        print("all [<class name>]")
+
+    def help_destroy(self):
+        """this provides the description for the 'destroy' do-handler"""
+        print("Usage:\t", end="")
+        print("destroy <class name> <id>")
+
+    def help_update(self):
+        """this provides the description for the 'update' do-handler"""
+        print("Usage:\t", end="")
+        attr_name = "<attribute name>"
+        attr_value = "<attribute value>"
+        print(f"update <class name> <id> \"{attr_name}\" \"{attr_value}\"")
+
+
+class CompletionClass(HelpClass):
     """auto-completion class for the HbnbCommand class"""
 
     def complete_create(self, text, line, _, __):

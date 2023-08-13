@@ -13,6 +13,7 @@ class User(BaseModel):
 
     def __init__(self, *_, **kwargs):
         """the constructor function"""
+        super().__init__(**kwargs)
         User.count += 1
 
     @staticmethod

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
+""" the module that defines the base model class """
 import datetime
 import models
 import uuid
-
-""" the module that defines the base model class """
 
 
 def is_uuid_valid(uuid_string):
@@ -21,19 +20,27 @@ class BaseModel:
 
     def __init__(self, *_, **kwargs):
         """the constructor function"""
-        if kwargs or kwargs.items():
+        if kwargs and kwargs.items():
             for key, value in kwargs.items():
                 if key == "__class__":
                     continue
                 if key == "created_at" or key == "updated_at":
                     if (value and type(value) == str):
                         format = "%Y-%m-%dT%H:%M:%S.%f"
-                        setattr(self, key, datetime.datetime.strptime(value, format))
+                        setattr(self, key,
+                                datetime.datetime.strptime(value, format))
                 elif key == "id":
                     if (is_uuid_valid(value)):
                         self.id = str(value)
+                    else:
+                        self.id = str(uuid.uuid4())
                 else:
                     self.__dict__[key] = value
+            if "created_at" not in kwargs.keys():
+                self.created_at = datetime.datetime.now()
+                self.updated_at = self.created_at
+            if "id" not in kwargs.keys():
+                self.id = str(uuid.uuid4())
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.datetime.now()
@@ -52,16 +59,6 @@ class BaseModel:
             updated_at instance attribute with the current date time"""
         self.updated_at = datetime.datetime.now()
         models.storage.save()
-
-    # def update(self, *args, **kwargs):
-    #     """a public instance method that updates or adds a new attribute
-    #         to the instance"""
-    #     print("dictionaries\n")
-    #     print(models.storage.all())
-    #     if args and len(args) % 2 == 0:
-    #         pass
-    #     elif kwargs and kwargs.items():
-    #         pass
 
     def to_dict(self):
         """a public instance method that returns the dictionary

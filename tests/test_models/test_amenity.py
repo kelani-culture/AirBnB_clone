@@ -40,7 +40,6 @@ class TestAmenity(unittest.TestCase):
         self.assertIsInstance(a1.id, str)
         self.assertIsInstance(a1.created_at, datetime)
         self.assertIsInstance(a1.updated_at, datetime)
-        self.assertEqual(a1.updated_at, a2.updated_at)
 
     def test_str(self):
         """Test method for str representation"""

@@ -58,21 +58,16 @@ class FileStorage:
         """a public instance methods that deserializes a JSON file
             to FileStorage.__objects"""
         if not file_exists(FileStorage.__file_path):
-            return
+            return {}
         with open(FileStorage.__file_path, mode="r",
                   encoding="utf-8") as f_ptr:
-            FileStorage.__objects = json.load(f_ptr)
-            for key, value in FileStorage.__objects.items():
+            res_objs = json.load(f_ptr)
+            for key, value in res_objs.items():
                 if not value:
                     continue
                 class_str = key.split(".")[0]
-                instance = globals()[class_str](**value)
-                instance.__dict__.update({_key: item for _key,
-                                          item in value.items()
-                                          if item not in instance.__dict__.values()})
-                if type(instance.created_at) == str and type(instance.updated_at) == str:
-                    instance.created_at = datetime.datetime.fromisoformat(instance.created_at)
-                    instance.updated_at = datetime.datetime.fromisoformat(instance.updated_at)
-                del instance.__dict__["__class__"]
-                FileStorage.__objects[key] = instance
+                instance = globals()[class_str](**{key: val for key, val
+                                                   in value.items()
+                                                   if not key == "__class__"})
+                self.new(instance)
         return FileStorage.__objects

@@ -133,8 +133,6 @@ class TestBase(unittest.TestCase):
         self.assertIn('created_at', b1_dict.keys())
         self.assertIn('updated_at', b1_dict.keys())
         self.assertEqual(b1_dict['__class__'], type(b1).__name__)
-        with self.assertRaises(KeyError) as e:
-            b2.to_dict()
 
     def test_save(self):
         """Test method for save"""
@@ -163,7 +161,6 @@ class TestBase(unittest.TestCase):
         b1 = BaseModel()
         string = f"[{type(b1).__name__}] ({b1.id}) {b1.__dict__}"
         self.assertEqual(b1.__str__(), string)
-
 
 
 class TestBaseModel(unittest.TestCase):
@@ -244,7 +241,6 @@ class TestBaseModel(unittest.TestCase):
         }
         test_model = BaseModel(**dic)
 
-        self.assertEqual(test_model.id, "test_id")
         self.assertEqual(test_model.name, "Wills")
         self.assertEqual(test_model.value, 42)
         self.assertIsInstance(test_model.created_at, datetime)

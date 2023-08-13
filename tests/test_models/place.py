@@ -4,6 +4,7 @@
 from models.place import Place
 import unittest
 
+
 class TestPlace(unittest.TestCase):
     """
     Implementation test for the amenity class

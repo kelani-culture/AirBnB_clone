@@ -13,6 +13,7 @@ class Amenity(BaseModel):
 
     def __init__(self, *_, **kwargs):
         """the constructor function"""
+        super().__init__(kwargs)
         Amenity.count += 1
 
     @staticmethod

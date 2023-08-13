@@ -61,7 +61,7 @@ class TestFileStorage_base(unittest.TestCase):
         storage.reload()
 
         # Retrieve the stored instance and check if
-        #the dynamically added attribute is present
+        # the dynamically added attribute is present
         loaded_objects = storage.all()
         self.assertTrue("BaseModel." + my_model.id in loaded_objects)
         retrieved_model = loaded_objects["BaseModel." + my_model.id]
@@ -69,7 +69,7 @@ class TestFileStorage_base(unittest.TestCase):
 
 
 class TestFileStorage_user(TestFileStorage_base):
-    """User test File storage that inherit from class 
+    """User test File storage that inherit from class
     """
 
     def setUp(self):
@@ -91,7 +91,7 @@ class TestFileStorage_user(TestFileStorage_base):
         loaded_objects = new_storage.all()
         key = "User." + self.my_user.id
         self.assertIn(key, loaded_objects)
- 
+
         # Retrieve the retrieved model
         retrieved_model = loaded_objects[key]
         self.assertEqual(retrieved_model.first_name, "Betty")
@@ -101,12 +101,8 @@ class TestFileStorage_user(TestFileStorage_base):
         storage.reload()
 
         # Retrieve the stored instance and check if
-        #the dynamically added attribute is present
+        # the dynamically added attribute is present
         loaded_objects = storage.all()
-        print("class name and id ", self.__class__.__name__, self.my_user.id)
-        print("loaded objects")
-        print(loaded_objects)
-        print("======")
         self.assertTrue("User." + self.my_user.id in loaded_objects)
         retrieved_model = loaded_objects["User." + self.my_user.id]
         self.assertEqual(retrieved_model.first_name, "Betty")
