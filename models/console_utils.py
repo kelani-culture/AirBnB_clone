@@ -5,6 +5,7 @@ from . import amenity, base_model, city
 from . import place, review, state
 from . import storage, user
 import cmd
+import json
 import re
 
 # globals
@@ -127,7 +128,9 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> bool:
         result_list = arg_extractor.get_arg_str_and_arg(raw_arg)
         result_dict = arg_extractor.get_arg_str_and_kwarg(raw_arg)
         if (result_dict):
-            return True
+            first_key = [item for item in result_dict.keys()][0]
+            first_value = [item for item in result_dict.values()][0]
+            handle_parsed_update(cls, first_key, **first_value)
         elif (result_list):
             first_key = [item for item in result_list.keys()][0]
             first_value = [item for item in result_list.values()][0]
@@ -334,73 +337,24 @@ class CmdArgToken():
         """
         failed = False
         split_tok = line.split(",")
-        tmp_dict = {"key": "value"}
+        tmp_dict = {}
         if len(split_tok) <= 1:
             failed = True
-
         test_id = re.findall(r"\s*((\"|\')([\w-]+)\2)\s*", split_tok[0])
         if not test_id:
             failed = True
             return tmp_dict
         if failed:
             return tmp_dict
-
+        id = f"{test_id[0][2]}"
         arg_tok = ",".join(split_tok[1:])  # i doubt this splitting mechanism
-        print(arg_tok)
-        kwarg_raw = re.findall("^\s*\{(.*)\}\s*$", arg_tok)
-        kwarg_tok = []
-        if kwarg_raw:
-            kwarg_tok = kwarg_raw[0].split(",")
-            for idx, item in enumerate(kwarg_tok):
-                kwarg_tok[idx] = item.split(":")
-        else:
-            failed = True
+        arg_tok = re.sub("\'", "\"", arg_tok)
+        res_tok = {}
+        try:
+            res_tok[id] = json.loads(arg_tok.strip())
+        except Exception:
             return tmp_dict
-
-        pairs_list = []
-        for item in kwarg_tok:
-            if len(item) != 2:
-                failed = True
-                break
-            for spot in item:
-                test_empty = re.search(r"^\s*(\"|\')?\s*$", str(spot))
-                if test_empty:
-                    failed = True
-                    break
-            if failed:
-                break
-        if failed:
-            return tmp_dict
-
-        # extract key-value pairs
-        key_list = []
-        value_list = []
-        for idx, item in enumerate(kwarg_tok):
-            for ind, tok in enumerate(item):
-                if ind == 0:
-                    print("key==")
-                    print(tok)
-                    test_key = re.findall(r"^\s*((\"|\')([\w]+)\2)\s*$", tok)
-                    if test_key:
-                        print(test_key[0])
-                    key_list.append(tok)
-                else:
-                    value_list.append(tok)
-                    print("value==")
-                    print(tok)
-                    test_val = re.match(r"^\s*([\d\.]+)|((\"|\')\s*([\w\@\.-])*\s*\3)\s*$", tok)
-                    if not test_val:
-                        test_val = re.match(r"\" John\"", tok)
-                        print(f"stubborn token .{tok}.")
-                    if test_val:
-                        print(test_val[0])
-                    else:
-                        print(f"re-token : {tok}")
-
-        if failed:
-            return tmp_dict
-        return tmp_dict
-
+        return res_tok
 
 class CompletionClass(cmd.Cmd):
     """auto-completion class for the HbnbCommand class"""
