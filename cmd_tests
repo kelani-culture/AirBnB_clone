@@ -1,1 +1,2 @@
-User.update("81c22fda-1cd1-4653-bc69-3074db0f22f1", "name", "frank miller")
+/*Amenity.update("38f4d3f9-e3a3-4e55-b2d1-917059fbe797", {"name": "sea side"})
+/* User.update("81c22fda-1cd1-4653-bc69-3074db0f22f1", "name", "frank miller") */

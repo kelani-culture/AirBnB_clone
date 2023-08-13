@@ -108,6 +108,7 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> bool:
         None
     """
     if cls not in completion_classes:
+        print("** class doesn't exist **")
         return False
     cls_key = ""
     arg_extractor = CmdArgToken()
@@ -119,28 +120,39 @@ def parse_and_handle_arg(cls: str, method: str, raw_arg: str) -> bool:
         if id and len(id) > 1:
             handle_show(cls, id[1])
         else:
+            print("** instance id missing **")
             return False
     elif method == "count":
         handle_count(cls)
     elif method == "create":
         handle_create(cls)
     elif method == "update":
-        result_list = arg_extractor.get_arg_str_and_arg(raw_arg)
-        result_dict = arg_extractor.get_arg_str_and_kwarg(raw_arg)
-        if (result_dict):
-            first_key = [item for item in result_dict.keys()][0]
-            first_value = [item for item in result_dict.values()][0]
-            handle_parsed_update(cls, first_key, **first_value)
-        elif (result_list):
-            first_key = [item for item in result_list.keys()][0]
-            first_value = [item for item in result_list.values()][0]
-            handle_parsed_update(cls, first_key, **first_value)
+        result_list = {}
+        result_dict = {}
+        test_dict = re.search(r"\{[^\}{]*\}", raw_arg)
+        if test_dict:
+            result_dict = arg_extractor.get_arg_str_and_kwarg(raw_arg)
+            if result_dict:
+                first_key = [item for item in result_dict.keys()][0]
+                first_value = [item for item in result_dict.values()][0]
+                handle_parsed_update(cls, first_key, **first_value)
+            else:
+                return False
         else:
-            return False
+            result_list = arg_extractor.get_arg_str_and_arg(raw_arg)
+            if result_list:
+                first_key = [item for item in result_list.keys()][0]
+                first_value = [item for item in result_list.values()][0]
+                handle_parsed_update(cls, first_key, **first_value)
+            else:
+                return False
     elif method == "destroy":
         id = arg_extractor.get_arg_str(raw_arg)
         if id and len(id) > 1:
             handle_destroy(cls, id[1])
+        elif not id:
+            print("** instance id missing **")
+            return False
         else:
             return False
     else:
@@ -220,6 +232,7 @@ def handle_update(cls_name, id, key, value):
     except KeyError:
         print("** no instance found **")
         return
+    value = derive_type_from_string(value)(value)
     setattr(storage.all()[res_key], str(key), value)
     storage.save()
 
@@ -252,7 +265,6 @@ class CmdArgToken():
         """this resolves the argument to a string only"""
         arg_str_arr = re.findall(r"^(\"|\')([\w-]+)\1", line)
         if not arg_str_arr:
-            print("** instance id missing **")
             return []
         return arg_str_arr[0]
 
@@ -273,14 +285,14 @@ class CmdArgToken():
             print("** instance id missing **")
             return {}
         for tok in split_tok:
-            test_contain = re.findall(r"\[\s*(\"|\')([\w\@\s]+)\1\s*\]", tok)
+            test_contain = re.findall(r"\[\s*(\"|\')([\w\@\s\.]+)\1\s*\]", tok)
             if (test_contain):
                 tmp_list.append(test_contain[0][1])
                 arg_list.append(tmp_list)
                 tmp_list = []
                 join = False
                 continue
-            test_open = re.findall(r"\[\s*(\"|\')([\w\@\s]+)\1\s*,\s*", tok)
+            test_open = re.findall(r"\[\s*(\"|\')([\w\@\s\.]+)\1\s*,\s*", tok)
             if test_open:
                 tmp_list.append(test_open[0][1])
                 join = True
@@ -296,13 +308,13 @@ class CmdArgToken():
                         tmp_list = []
                     continue
                 else:
-                    pattern = r"\s*(\"|\')([\w\@\s]+)\1\s*,\s*"
+                    pattern = r"\s*(\"|\')([\w\@\s\.]+)\1\s*,\s*"
                     test_between = re.findall(pattern, tok)
                     if test_between:
                         tmp_list.append(test_between[0][1])
                         join = True
             else:
-                pattern = r"\s*((\"|\')([\w\@\s-]+)\2)|([\d\.]+)\s*"
+                pattern = r"\s*((\"|\')([\w\@\s\.-]+)\2)|([\d\.]+)\s*"
                 test_str_dig = re.findall(pattern, tok)
                 if test_str_dig:
                     if not len(test_str_dig[0]) == 4:
@@ -316,7 +328,11 @@ class CmdArgToken():
                         arg_list.append(test_str_dig[0][3])
                     else:
                         arg_list.append(test_str_dig[0][2])
+        if len(arg_list) == 1:
+            print("** attribute name missing **")
+            return {}
         if not len(arg_list) % 2 or failed:
+            print("** value missing **")
             return {}
         res_dict = []
         res_list = arg_list[1:]
@@ -324,9 +340,9 @@ class CmdArgToken():
             if type(item) == str:
                 dig_test = re.search(r"^[\d\.]+$", item)
                 if dig_test:
-                    res_list[idx] = int(item)
+                    res_list[idx] = derive_type_from_string(item)(item)
         for idx, item in enumerate(res_list):
-            if idx % 2 == 0 or not idx:
+            if idx % 2 == 0:
                 res_dict.append((item, res_list[idx + 1]))
         res = {arg_list[0]: dict(res_dict)}
         return res
@@ -345,12 +361,15 @@ class CmdArgToken():
             failed = True
         test_id = re.findall(r"\s*((\"|\')([\w-]+)\2)\s*", split_tok[0])
         if not test_id:
+            print("** instance id missing **")
             failed = True
             return tmp_dict
         if failed:
             return tmp_dict
         id = f"{test_id[0][2]}"
         arg_tok = ",".join(split_tok[1:])  # i doubt this splitting mechanism
+        if not arg_tok:
+            print("** value missing **")
         arg_tok = re.sub("\'", "\"", arg_tok)
         res_tok = {}
         try:
@@ -389,6 +408,21 @@ class HelpClass(cmd.Cmd):
         attr_name = "<attribute name>"
         attr_value = "<attribute value>"
         print(f"update <class name> <id> \"{attr_name}\" \"{attr_value}\"")
+
+    def help_EOF(self):
+        """display help information for the ^D keys"""
+        print("\nUsage: CTRL+D\n")
+        print("This command allows you to exit the cmd\
+                interpreter in a graceful manner", end=" ")
+
+    def help_quit(self):
+        """
+        Display help information for the quit command.
+        """
+        print("\nUsage: quit\n")
+        print("This command allows you to exit the cmd\
+                interpreter.", end=" ")
+        print()
 
 
 class CompletionClass(HelpClass):

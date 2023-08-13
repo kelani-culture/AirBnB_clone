@@ -10,7 +10,17 @@ import re
 import sys
 
 
-class HbnbCommand(CompletionClass):
+def split_command_line_args(command_line):
+    """split arguments logically using spaces"""
+    pattern = r'"([^"]+)"|\'([^\']+)|\s+|(\S+)'
+    args = [group for group in re.findall(pattern, command_line) if any(group)]
+    if args:
+        for idx, arg in enumerate(args):
+            args[idx] = "".join(arg)
+    return args
+
+
+class HBNBCommand(CompletionClass):
     """Implementation of the command line
         intepreter"""
     prompt = "(hbnb) "
@@ -61,9 +71,9 @@ class HbnbCommand(CompletionClass):
     def do_update(self, line):
         """this delegates the updating of fields
             of the entries in the storage file"""
-        parsed = line.split()
+        parsed = split_command_line_args(line)
         if len(parsed) == 1 and "." in parsed[0]:
-            self.default(parsed)
+            self.default(str(parsed))
             return
         handle_arg(4, "update", parsed, handle_update)
 
@@ -87,22 +97,13 @@ class HbnbCommand(CompletionClass):
             return
         cls_raw, method_raw, arg_raw = raw[0]
         if not parse_and_handle_arg(cls_raw, method_raw, arg_raw):
-            super().default(line)
+            return
 
     def emptyline(self):
         """handles the enter key"""
         pass
 
-    def help_quit(self):
-        """
-        Display help information for the quit command.
-        """
-        print("\nUsage: quit\n")
-        print("This command allows you to exit the cmd\
-                interpreter.", end=" ")
-        print()
-
 
 if __name__ == "__main__":
-    Hbnb_cmd = HbnbCommand()
-    Hbnb_cmd.cmdloop()
+    HBNB_cmd = HBNBCommand()
+    HBNB_cmd.cmdloop()
