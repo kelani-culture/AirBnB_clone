@@ -298,7 +298,7 @@ class CmdArgToken():
                 join = True
                 continue
             if join:
-                pattern = r"\s*(\"|\')([\w\@\s]+)\1\s*\]\s*,?\s*"
+                pattern = r"\s*(\"|\')([\w\@\s\.]+)\1\s*\]\s*,?\s*"
                 test_close = re.findall(pattern, tok)
                 if test_close:
                     tmp_list.append(test_close[0][1])
@@ -336,6 +336,8 @@ class CmdArgToken():
             return {}
         res_dict = []
         res_list = arg_list[1:]
+        print("results")
+        print(res_list)
         for idx, item in enumerate(res_list):
             if type(item) == str:
                 dig_test = re.search(r"^[\d\.]+$", item)
@@ -412,16 +414,16 @@ class HelpClass(cmd.Cmd):
     def help_EOF(self):
         """display help information for the ^D keys"""
         print("\nUsage: CTRL+D\n")
-        print("This command allows you to exit the cmd\
-                interpreter in a graceful manner", end=" ")
+        print("This command allows you to exit the cmd "
+              "interpreter in a graceful manner\n")
 
     def help_quit(self):
         """
         Display help information for the quit command.
         """
         print("\nUsage: quit\n")
-        print("This command allows you to exit the cmd\
-                interpreter.", end=" ")
+        print("This command allows you to exit the cmd "
+              "interpreter.\n")
         print()
 
 

@@ -1,1 +1,2 @@
 the json file is being mutated by the test suite
+in the arg list parsing of custom commands, arrays as values are not working
