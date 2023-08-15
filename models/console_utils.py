@@ -336,8 +336,6 @@ class CmdArgToken():
             return {}
         res_dict = []
         res_list = arg_list[1:]
-        print("results")
-        print(res_list)
         for idx, item in enumerate(res_list):
             if type(item) == str:
                 dig_test = re.search(r"^[\d\.]+$", item)
@@ -379,73 +377,3 @@ class CmdArgToken():
         except Exception:
             return tmp_dict
         return res_tok
-
-
-class HelpClass(cmd.Cmd):
-    """the class responsible for the description handling"""
-
-    def help_create(self):
-        """this provides the description for the 'create' do-handler"""
-        print("Usage:\t", end="")
-        print("create <class name>")
-
-    def help_show(self):
-        """this provides the description for the 'show' do-handler"""
-        print("Usage:\t", end="")
-        print("show <class name> <id>")
-
-    def help_all(self):
-        """this provides the description for the 'all' do-handler"""
-        print("Usage:\t", end="")
-        print("all [<class name>]")
-
-    def help_destroy(self):
-        """this provides the description for the 'destroy' do-handler"""
-        print("Usage:\t", end="")
-        print("destroy <class name> <id>")
-
-    def help_update(self):
-        """this provides the description for the 'update' do-handler"""
-        print("Usage:\t", end="")
-        attr_name = "<attribute name>"
-        attr_value = "<attribute value>"
-        print(f"update <class name> <id> \"{attr_name}\" \"{attr_value}\"")
-
-    def help_EOF(self):
-        """display help information for the ^D keys"""
-        print("\nUsage: CTRL+D\n")
-        print("This command allows you to exit the cmd "
-              "interpreter in a graceful manner\n")
-
-    def help_quit(self):
-        """
-        Display help information for the quit command.
-        """
-        print("\nUsage: quit\n")
-        print("This command allows you to exit the cmd "
-              "interpreter.\n")
-        print()
-
-
-class CompletionClass(HelpClass):
-    """auto-completion class for the HbnbCommand class"""
-
-    def complete_create(self, text, line, _, __):
-        """auto-completion for all command"""
-        return suggest(text, line)
-
-    def complete_show(self, text, line, _, __):
-        """auto-completion for show command"""
-        return suggest(text, line)
-
-    def complete_all(self, text, line, _, __):
-        """auto-completion for all command"""
-        return suggest(text, line)
-
-    def complete_destroy(self, text, line, _, __):
-        """auto-completion for destroy command"""
-        return suggest(text, line)
-
-    def complete_update(self, text, line, _, __):
-        """auto-completion for update command"""
-        return suggest(text, line)
