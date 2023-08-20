@@ -39,6 +39,7 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    cursor: pointer;
   }
   
   .locations {
@@ -57,3 +58,41 @@
     font-size: 14px;
     margin: 0;
   }
+
+
+/* Popover styles */
+.popover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #FAFAFA;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+
+    display: none; /* Hide popover by default */
+  }
+  
+  /* Show popover when hovering over filter div */
+  .locations:hover .popover,
+  .amenities:hover .popover {
+    display: block;
+  }
+  
+  .popover li {
+    list-style: none;
+    padding: 5px 15px;
+  }
+  
+  .popover h2 {
+    margin: 0;
+    font-size: 16px;
+    padding: 5px 15px;
+    border-radius: 4px;
+  }
+  
+  /* Additional styles to position popover */
+  .locations, .amenities {
+    position: relative;
+  }
+

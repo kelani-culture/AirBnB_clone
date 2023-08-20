@@ -1,9 +1,4 @@
 /* Filter section styles */
-.container {
-    max-width: 1000px;
-    margin: 30px auto;
-  }
-
 .filters {
     background-color: white;
     height: 70px;
