@@ -15,6 +15,9 @@
 .place {
   width: 390px;
   padding: 20px;
+  padding-bottom: 200px;
+  display: flex;
+  flex-direction: column;
   border: 1px solid #FF5A5F;
   border-radius: 4px;
   margin-top: 80px;
@@ -116,10 +119,14 @@
 
 .user{
   position: relative;
-  padding: 10px;
+  margin: 20px;
   right: 20px;
 }
 .description{
   position: relative;
   right: 0px
+}
+
+.place:last-child {
+  margin-bottom: 0;
 }
